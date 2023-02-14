@@ -1,0 +1,10 @@
+div {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;
+    flex-direction: row;
+}
+
+div > span {
+    padding: 4px;
+}

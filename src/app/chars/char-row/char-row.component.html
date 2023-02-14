@@ -1,0 +1,15 @@
+<div (click)="displayCharPage()">
+    <span>{{ char.name }}</span>
+    <span>{{ char.tvShows.length }}</span>
+    <span>{{ char.videoGames.length }}</span>
+    <span>
+        <ng-container *ngFor="let allyName of char.allies">
+            <span>{{ allyName }}</span>
+        </ng-container>
+    </span>
+    <span>
+        <ng-container *ngFor="let enemyName of char.enemies">
+            <span>{{ enemyName }}</span>
+        </ng-container>
+    </span>
+</div>

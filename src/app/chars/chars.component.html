@@ -1,0 +1,10 @@
+<div>
+    <span>Name</span>
+    <span># TV Shows</span>
+    <span># Video Games</span>
+    <span>Allies</span>
+    <span>Enemies</span>
+</div>
+<ng-container *ngFor="let j of resultsIndexes; let i = index">
+    <app-char-row [char]="chars[i]"></app-char-row>
+</ng-container>
