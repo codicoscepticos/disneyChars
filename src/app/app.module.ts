@@ -2,13 +2,18 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { HighchartsChartModule } from 'highcharts-angular';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { CharsComponent } from './chars/chars.component';
 import { CharRowComponent } from './chars/char-row/char-row.component';
-import { CharComponent } from './chars/char/char.component';
+import { CharComponent } from './char/char.component';
+
+import { charsPageReducer } from './state/state.reducers';
+import { CharsPageEffects } from './state/state.effects';
 
 @NgModule({
   declarations: [
@@ -21,7 +26,9 @@ import { CharComponent } from './chars/char/char.component';
     BrowserModule,
     HttpClientModule,
     AppRoutingModule,
-    HighchartsChartModule
+    HighchartsChartModule,
+    StoreModule.forRoot({ charsPage: charsPageReducer }),
+    EffectsModule.forRoot([CharsPageEffects])
   ],
   providers: [],
   bootstrap: [AppComponent]

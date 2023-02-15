@@ -5,6 +5,8 @@
     <span>Allies</span>
     <span>Enemies</span>
 </div>
-<ng-container *ngFor="let j of resultsIndexes; let i = index">
-    <app-char-row [char]="chars[i]"></app-char-row>
-</ng-container>
+<!-- <ng-container *ngIf="chars$ | async as chars">
+    <ng-container *ngFor="let j of resultsIndexes; let i = index">
+        <app-char-row [char]="chars[i]"></app-char-row>
+    </ng-container>
+</ng-container> -->

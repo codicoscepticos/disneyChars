@@ -1,7 +1,8 @@
 import { Component } from '@angular/core';
+import { Observable } from 'rxjs';
 import { Char } from '../interfaces/Char';
 import { Page } from '../interfaces/Page';
-import { DisneyAPIService } from '../services/disney-api.service';
+import { StateService } from '../services/state.service';
 
 @Component({
   selector: 'app-chars',
@@ -9,32 +10,28 @@ import { DisneyAPIService } from '../services/disney-api.service';
   styleUrls: ['./chars.component.css']
 })
 export class CharsComponent {
-  constructor(private disneyApi:DisneyAPIService){}
-  
   pageNum:number = 1;
   resultsNum:number = 50;
   readonly resultsNumPerPage:number = 50;
   
-  chars:Char[] = [];
+  chars$:Observable<Char[]> = this.stateService.getChars();
   resultsIndexes:null[] = Array(this.resultsNum).fill(null);
   
-  addChar(data: Object){
-    this.chars.push(data as Char);
-  }
+  constructor(private stateService:StateService){}
   
-  addChars(data: Object){
-    const page = (data as Page);
-    page.data.forEach(this.addChar, this);
+  // addChar(data: Object){
+  //   this.chars.push(data as Char);
+  // }
+  
+  // addChars(data: Object){
+  //   const page = (data as Page);
+  //   page.data.forEach(this.addChar, this);
     
-    console.log(this.chars);
-  }
+  //   console.log(this.chars);
+  // }
   
-  getChars(){
-    const addChars = this.addChars.bind(this);
-    this.disneyApi.getChars().subscribe(addChars);
-  }
-  
-  ngOnInit(){
-    this.getChars();
-  }
+  // getChars(){
+  //   const addChars = this.addChars.bind(this);
+  //   this.disneyApi.getChars().subscribe(addChars);
+  // }
 }

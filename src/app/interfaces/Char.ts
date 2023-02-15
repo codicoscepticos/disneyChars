@@ -1,11 +1,12 @@
 export interface Char{
-    allies: string[],
-    enemies: string[],
-    imageUrl: string,
-    name: string,
-    tvShows: string[],
-    videoGames: string[],
-}
+    _id:number,
+    allies:string[],
+    enemies:string[],
+    imageUrl:string,
+    name:string,
+    tvShows:string[],
+    videoGames:string[]
+};
 
 // ■  Character name 
 // ■  In how many TV shows this character participates in. 
