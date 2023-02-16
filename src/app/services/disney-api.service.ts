@@ -1,13 +1,15 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 
-@Injectable({
-  providedIn: 'root'
-})
-export class DisneyAPIService {
-  constructor(private http:HttpClient) { }
+@Injectable()
+export class DisneyAPIService{
+  constructor(private http:HttpClient){}
   
-  getCharsPage(){
-    return this.http.get('https://api.disneyapi.dev/characters');
+  static readonly baseUrl = 'https://api.disneyapi.dev/characters?page=';
+  static readonly resultsNumPerPage = 50;
+  
+  getCharsPage(pageIndex:number){
+    const url = DisneyAPIService.baseUrl + pageIndex;
+    return this.http.get(url);
   }
 }

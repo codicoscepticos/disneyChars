@@ -2,6 +2,6 @@ import { Char } from './Char';
 
 export interface CharsState{
     chars:Char[],
-    pageNum:number,
+    pageIndex:number,
     selectedChar:null
 };

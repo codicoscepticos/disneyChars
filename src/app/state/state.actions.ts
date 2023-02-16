@@ -9,7 +9,10 @@ export const sortByName = createAction('[Chars] Sort By Name');
 
 export const displayCharPage = createAction('[Char Row] Display Char Page');
 
-export const fetchCharsPage = createAction('[Disney API] Fetch Characters Page');
+export const fetchCharsPage = createAction(
+    '[Disney API] Fetch Characters Page',
+    props<{ pageIndex:number }>()
+);
 export const succeedFetchingCharsPage = createAction(
     '[Disney API] Succeed Fetching Chars Page',
     props<{ charsPage:Page }>()

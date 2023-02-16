@@ -17,8 +17,8 @@ export class CharsPageEffects{
     fetchCharsPage$ = createEffect(()=>
         this.actions$.pipe(
             ofType(fetchCharsPage),
-            switchMap(()=>this.disneyAPIService.getCharsPage()
-                .pipe(
+            switchMap(
+                ({pageIndex})=>this.disneyAPIService.getCharsPage(pageIndex).pipe(
                     map(charsPage=>succeedFetchingCharsPage({ charsPage:<Page> charsPage })),
                     catchError(error=>of(failFetchingCharsPage({ error })))
                 )

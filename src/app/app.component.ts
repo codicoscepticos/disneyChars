@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
-import { BehaviorSubject, Observable } from 'rxjs';
 import * as Highcharts from 'highcharts';
+import { BehaviorSubject } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 import {
@@ -16,10 +16,15 @@ import {
   displayCharPage
 } from './state/state.actions';
 import { selectCharsPage } from './state/state.selectors';
+
 import { AppState } from './interfaces/AppState';
-import { StateService } from './services/state.service';
-import { Page } from './interfaces/Page';
 import { Char } from './interfaces/Char';
+import { Page } from './interfaces/Page';
+
+import { DisneyAPIService } from './services/disney-api.service';
+import { StateService } from './services/state.service';
+import { MessengerService } from './services/messenger.service';
+import { Message } from './interfaces/Message';
 
 @Component({
   selector: 'app-root',
@@ -27,33 +32,56 @@ import { Char } from './interfaces/Char';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
-  constructor(private store: Store<AppState>, private stateService:StateService){}
+  constructor(
+    private messengerService:MessengerService,
+    private stateService:StateService,
+    private store: Store<AppState>
+  ){}
   
-  pageNum:number = 1;
-  resultsNum:number = 50;
-  readonly resultsNumPerPage:number = 50;
+  resultsNum:number = 50; // RETHINK
   
-  chars$:BehaviorSubject<Char[]> = this.stateService.getChars();
-  charsPage$ = this.store.select(selectCharsPage);
-  resultsIndexes:null[] = Array(this.resultsNum).fill(null);
+  chars$:BehaviorSubject<Char[]> = this.stateService.getChars$();
+  charsPage$ = this.store.select(selectCharsPage); // RETHINK Maybe move inside observePage
   
   ngOnInit(){
-    this.store.dispatch(fetchCharsPage());
-    this.observePage();
+    this.observeMessenger().fetchCharsPageByIndex(1).observePage();
   }
   
-  onNextPage(page: Page){
+  //==== App Events ====
+  
+  handleMessage(msg:Message){
+    if (msg.name === 'nextPage') {
+      this.fetchCharsPageByIndex(msg.content);
+      this.resultsNum += DisneyAPIService.resultsNumPerPage;
+    }
+  }
+  
+  handleNextPage(page:Page){
     let chars = <Char[]>page.data;
     chars = <Char[]>[...this.chars$.getValue(), ...chars]; // NOTE merging
     
     this.chars$.next(chars);
   }
   
+  //==== Methods ====
+  
+  fetchCharsPageByIndex(pageIndex:number){
+    this.store.dispatch(fetchCharsPage({pageIndex}));
+    return this;
+  }
+  
+  observeMessenger(){
+    const handleMessage = this.handleMessage.bind(this);
+    const messenger$ = this.messengerService.getMessenger$();
+    messenger$.subscribe(handleMessage);
+    return this;
+  }
+  
   observePage(){
     this.charsPage$.subscribe({
-      next: this.onNextPage.bind(this),
+      next: this.handleNextPage.bind(this),
       error: console.log,
-      complete: () => console.log('Complete')
+      complete: ()=>console.log('Complete')
     });
   }
 }

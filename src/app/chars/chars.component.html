@@ -1,3 +1,4 @@
+<button (click)="onNextPage()">Next Page</button>
 <div>
     <span>Name</span>
     <span># TV Shows</span>
@@ -6,7 +7,7 @@
     <span>Enemies</span>
 </div>
 <ng-container *ngIf="chars$ | async as chars">
-    <ng-container *ngFor="let j of resultsIndexes; let i = index">
+    <ng-container *ngFor="let i of resultsIndexes">
         <app-char-row [char]="chars[i]"></app-char-row>
     </ng-container>
 </ng-container>

@@ -1,6 +1,8 @@
 import { Component, Input } from '@angular/core';
-import { Char } from 'src/app/interfaces/Char';
 import { Router } from "@angular/router";
+
+import { StateService } from 'src/app/services/state.service';
+import { Char } from 'src/app/interfaces/Char';
 
 @Component({
   selector: 'app-char-row',
@@ -10,12 +12,20 @@ import { Router } from "@angular/router";
 export class CharRowComponent {
   @Input() char:Char = {} as Char;
   
-  constructor(private router:Router){
+  constructor(private router:Router, private stateService:StateService){
     console.log(this.char);
   }
   
+  //==== DOM Events ====
+  
+  onClick(evt:MouseEvent){
+    this.displayCharPage();
+  }
+  
+  //==== Methods ====
+  
   displayCharPage(){
-    const extras = {state: {char: this.char}};
-    this.router.navigate(['char'], extras);
+    this.stateService.updateSelectedChar(this.char);
+    this.router.navigate(['char']);
   }
 }

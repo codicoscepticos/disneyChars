@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+
+import { StateService } from '../services/state.service';
 import { Char } from 'src/app/interfaces/Char';
 
 @Component({
@@ -8,10 +9,7 @@ import { Char } from 'src/app/interfaces/Char';
   styleUrls: ['./char.component.css']
 })
 export class CharComponent {
-  char:Char = {} as Char;
+  constructor(private stateService:StateService){}
   
-  constructor(private router:Router){
-    const nav = this.router.getCurrentNavigation();
-    if (nav) this.char = nav.extras.state?.['char'];
-  }
+  char:Char = this.stateService.getSelectedChar();
 }
