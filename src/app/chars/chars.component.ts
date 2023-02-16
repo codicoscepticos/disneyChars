@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 import { Char } from '../interfaces/Char';
-import { Page } from '../interfaces/Page';
 import { StateService } from '../services/state.service';
 
 @Component({
@@ -10,28 +9,12 @@ import { StateService } from '../services/state.service';
   styleUrls: ['./chars.component.css']
 })
 export class CharsComponent {
+  constructor(private stateService:StateService){}
+  
   pageNum:number = 1;
   resultsNum:number = 50;
   readonly resultsNumPerPage:number = 50;
   
-  chars$:Observable<Char[]> = this.stateService.getChars();
+  chars$:BehaviorSubject<Char[]> = this.stateService.getChars();
   resultsIndexes:null[] = Array(this.resultsNum).fill(null);
-  
-  constructor(private stateService:StateService){}
-  
-  // addChar(data: Object){
-  //   this.chars.push(data as Char);
-  // }
-  
-  // addChars(data: Object){
-  //   const page = (data as Page);
-  //   page.data.forEach(this.addChar, this);
-    
-  //   console.log(this.chars);
-  // }
-  
-  // getChars(){
-  //   const addChars = this.addChars.bind(this);
-  //   this.disneyApi.getChars().subscribe(addChars);
-  // }
 }

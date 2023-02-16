@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import * as Highcharts from 'highcharts';
 
 import { Store } from '@ngrx/store';
@@ -19,6 +19,7 @@ import { selectCharsPage } from './state/state.selectors';
 import { AppState } from './interfaces/AppState';
 import { StateService } from './services/state.service';
 import { Page } from './interfaces/Page';
+import { Char } from './interfaces/Char';
 
 @Component({
   selector: 'app-root',
@@ -32,24 +33,26 @@ export class AppComponent {
   resultsNum:number = 50;
   readonly resultsNumPerPage:number = 50;
   
-  // chars$
+  chars$:BehaviorSubject<Char[]> = this.stateService.getChars();
   charsPage$ = this.store.select(selectCharsPage);
   resultsIndexes:null[] = Array(this.resultsNum).fill(null);
   
   ngOnInit(){
-    // this.stateService.setChars(this.chars$);
     this.store.dispatch(fetchCharsPage());
     this.observePage();
   }
   
-  getChars(){
-    // return this.chars$;
+  onNextPage(page: Page){
+    let chars = <Char[]>page.data;
+    chars = <Char[]>[...this.chars$.getValue(), ...chars]; // NOTE merging
+    
+    this.chars$.next(chars);
   }
   
   observePage(){
     this.charsPage$.subscribe({
-      next: value => console.log(value),
-      error: error => console.log(error),
+      next: this.onNextPage.bind(this),
+      error: console.log,
       complete: () => console.log('Complete')
     });
   }

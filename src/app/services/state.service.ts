@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { BehaviorSubject } from 'rxjs';
 
 import { Char } from '../interfaces/Char';
 
@@ -7,13 +7,9 @@ import { Char } from '../interfaces/Char';
   providedIn: 'root'
 })
 export class StateService {
-  private chars$ = of(<Char[]>[]);
+  private chars$ = new BehaviorSubject<Char[]>([]);
   
   getChars(){
     return this.chars$;
-  }
-  
-  setChars(chars$:Observable<Char[]>){
-    this.chars$ = chars$;
   }
 }
