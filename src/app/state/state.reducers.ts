@@ -18,7 +18,7 @@ import {
 import { Page } from '../interfaces/Page';
 
 export const initState:Page = {
-    count: 50,
+    count: 0,
     data: [],
     nextPage: '',
     prevPage: '',

@@ -39,10 +39,10 @@ export class AppComponent {
     AppComponent.assignHandlersForMsgs();
   }
   
-  resultsNum:number = 0; // RETHINK
-  
   chars$ = new BehaviorSubject<Char[]>([]);
   charsPage$ = this.store.select(selectCharsPage); // RETHINK Maybe move inside observePage
+  maxPageIndex:number = Infinity;
+  resultsNum:number = 0;
   selChar:Char|undefined = undefined;
   
   ngOnInit(){
@@ -55,6 +55,17 @@ export class AppComponent {
   handleMsg(msg:Message){
     const handler = <Function>AppComponent.handlerPerMsg[msg.name];
     if (handler) handler.call(this, msg.content);
+  }
+  handleCharSelected(char:Char|undefined){
+    this.updateSelChar(char);
+  }
+  handleGetMaxPageIndex(maxPageIndex$:BehaviorSubject<number>){
+    maxPageIndex$.next(3);//this.maxPageIndex
+  }
+  handlePageTurned(pageIndex:number){
+    const startIndex = DisneyAPIService.resultsNumPerPage * (pageIndex - 1);
+    const endIndex = this.resultsNum - 1;
+    if (startIndex > endIndex) this.fetchCharsPageByIndex(pageIndex);
   }
   
   //==== Observers ====
@@ -72,8 +83,10 @@ export class AppComponent {
   observeNextPage(page:Page){
     let chars = <Char[]>page.data;
     chars = <Char[]>[...this.chars$.getValue(), ...chars]; // NOTE merging
-    
     this.chars$.next(chars);
+    
+    this.resultsNum += page.count;
+    this.maxPageIndex = page.totalPages; // RETHINK Could possibly move the property to the child and call a child's method to update it.
   }
   
   setPageObserver(){
@@ -89,7 +102,6 @@ export class AppComponent {
   
   fetchCharsPageByIndex(pageIndex:number){
     this.store.dispatch(fetchCharsPage({pageIndex}));
-    this.resultsNum += DisneyAPIService.resultsNumPerPage;
     return this;
   }
   
@@ -99,8 +111,9 @@ export class AppComponent {
   }
   
   static readonly handlerPerMsg: HandlerPerMsg = {
-    charSelected: 'updateSelChar',
-    nextPage: 'fetchCharsPageByIndex'
+    charSelected: 'handleCharSelected',
+    getMaxPageIndex: 'handleGetMaxPageIndex',
+    pageTurned: 'handlePageTurned'
   };
   static assignHandlersForMsgs(){ // TODO move to helper service
     let handlerPerMsg = AppComponent.handlerPerMsg;

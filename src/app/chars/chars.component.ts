@@ -22,11 +22,11 @@ export class CharsComponent {
   
   //==== DOM Events ====
   
-  onNextPage(){
-    this.pageIndex += 1;
+  onPageByDiff(diff:number){
+    this.pageIndex += diff;
     this.resultsIndexes = this.generateIndexes();
     
-    const msg = <Message>{name: 'nextPage', content: this.pageIndex};
+    const msg = <Message>{name: 'pageTurned', content: this.pageIndex};
     this.onMsg.emit(msg);
   }
   
@@ -35,6 +35,13 @@ export class CharsComponent {
   handleMsg(msg:Message){
     const handler = <Function>CharsComponent.handlerPerMsg[msg.name];
     if (!handler) this.onMsg.emit(msg);
+  }
+  
+  askMaxPageIndex$(){
+    let maxPageIndex$ = new BehaviorSubject<number>(Infinity);
+    const msg = <Message>{name: 'getMaxPageIndex', content: maxPageIndex$};
+    this.onMsg.emit(msg);
+    return maxPageIndex$;
   }
   
   //==== Methods ====
