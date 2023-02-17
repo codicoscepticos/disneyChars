@@ -8,6 +8,6 @@
 </div>
 <ng-container *ngIf="chars$ | async as chars">
     <ng-container *ngFor="let i of resultsIndexes">
-        <app-char-row [char]="chars[i]"></app-char-row>
+        <app-char-row [char]="chars[i]" (onMsg)="handleMsg($event)"></app-char-row>
     </ng-container>
 </ng-container>

@@ -1,10 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-import { MessengerService } from '../services/messenger.service';
-import { StateService } from '../services/state.service';
-
 import { Char } from '../interfaces/Char';
+import { HandlerPerMsg } from '../interfaces/HandlerPerMsg';
+import { Message } from '../interfaces/Message';
 
 @Component({
   selector: 'app-chars',
@@ -12,9 +11,10 @@ import { Char } from '../interfaces/Char';
   styleUrls: ['./chars.component.css']
 })
 export class CharsComponent {
-  constructor(private messengerService:MessengerService, private stateService:StateService){}
+  @Input() chars$ = new BehaviorSubject<Char[]>([]);
+  @Output() onMsg = new EventEmitter<Message>();
   
-  chars$:BehaviorSubject<Char[]> = this.stateService.getChars$();
+  constructor(){}
   
   pageIndex:number = 1; // NOTE Changes according if going to prev or next page.
   resultsNumPerPage:number = 50; // TODO To be changed by the user. // NOTE If num of chars is less than the selected results per page of the app, should fetch the rest of the pages, and display accordingly.
@@ -25,12 +25,21 @@ export class CharsComponent {
   onNextPage(){
     this.pageIndex += 1;
     this.resultsIndexes = this.generateIndexes();
-    this.messengerService.sendMsg({name: 'nextPage', content: this.pageIndex});
+    
+    const msg = <Message>{name: 'nextPage', content: this.pageIndex};
+    this.onMsg.emit(msg);
+  }
+  
+  //==== Message Handler (for child) ====
+  
+  handleMsg(msg:Message){
+    const handler = <Function>CharsComponent.handlerPerMsg[msg.name];
+    if (!handler) this.onMsg.emit(msg);
   }
   
   //==== Methods ====
   
-  generateIndexes(){ // RETHINK Maybe move to a helper function.
+  generateIndexes(){ // RETHINK Maybe move to a helper service.
     let indexes = [];
     
     let pageIndex = this.pageIndex;
@@ -43,4 +52,6 @@ export class CharsComponent {
     
     return indexes;
   }
+  
+  static readonly handlerPerMsg: HandlerPerMsg = {};
 }

@@ -5,7 +5,6 @@ import { HighchartsChartModule } from 'highcharts-angular';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
 import { CharsComponent } from './chars/chars.component';
@@ -17,7 +16,6 @@ import { CharsPageEffects } from './state/state.effects';
 
 import { DisneyAPIService } from './services/disney-api.service';
 import { MessengerService } from './services/messenger.service';
-import { StateService } from './services/state.service';
 
 @NgModule({
   declarations: [
@@ -29,12 +27,11 @@ import { StateService } from './services/state.service';
   imports: [
     BrowserModule,
     HttpClientModule,
-    AppRoutingModule,
     HighchartsChartModule,
     StoreModule.forRoot({ charsPage: charsPageReducer }),
     EffectsModule.forRoot([CharsPageEffects])
   ],
-  providers: [DisneyAPIService, MessengerService, StateService],
+  providers: [DisneyAPIService, MessengerService],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -1,6 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 
-import { StateService } from '../services/state.service';
 import { Char } from 'src/app/interfaces/Char';
 
 @Component({
@@ -9,7 +8,7 @@ import { Char } from 'src/app/interfaces/Char';
   styleUrls: ['./char.component.css']
 })
 export class CharComponent {
-  constructor(private stateService:StateService){}
+  @Input() char = <Char>{};
   
-  char:Char = this.stateService.getSelectedChar();
+  constructor(){}
 }

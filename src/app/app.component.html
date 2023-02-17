@@ -1,1 +1,4 @@
-<router-outlet></router-outlet>
+<app-chars [chars$]="chars$" (onMsg)="handleMsg($event)"></app-chars>
+<ng-container *ngIf="selChar !== undefined">
+    <app-char [char]="selChar"></app-char>
+</ng-container>

@@ -22,9 +22,9 @@ import { Char } from './interfaces/Char';
 import { Page } from './interfaces/Page';
 
 import { DisneyAPIService } from './services/disney-api.service';
-import { StateService } from './services/state.service';
 import { MessengerService } from './services/messenger.service';
 import { Message } from './interfaces/Message';
+import { HandlerPerMsg } from './interfaces/HandlerPerMsg';
 
 @Component({
   selector: 'app-root',
@@ -34,54 +34,79 @@ import { Message } from './interfaces/Message';
 export class AppComponent {
   constructor(
     private messengerService:MessengerService,
-    private stateService:StateService,
     private store: Store<AppState>
-  ){}
+  ){
+    AppComponent.assignHandlersForMsgs();
+  }
   
-  resultsNum:number = 50; // RETHINK
+  resultsNum:number = 0; // RETHINK
   
-  chars$:BehaviorSubject<Char[]> = this.stateService.getChars$();
+  chars$ = new BehaviorSubject<Char[]>([]);
   charsPage$ = this.store.select(selectCharsPage); // RETHINK Maybe move inside observePage
+  selChar:Char|undefined = undefined;
   
   ngOnInit(){
-    this.observeMessenger().fetchCharsPageByIndex(1).observePage();
+    // this.setMessengerObserver();
+    this.setPageObserver().fetchCharsPageByIndex(1);
   }
   
-  //==== App Events ====
+  //==== Message Handler (for child) ====
   
-  handleMessage(msg:Message){
-    if (msg.name === 'nextPage') {
-      this.fetchCharsPageByIndex(msg.content);
-      this.resultsNum += DisneyAPIService.resultsNumPerPage;
-    }
+  handleMsg(msg:Message){
+    const handler = <Function>AppComponent.handlerPerMsg[msg.name];
+    if (handler) handler.call(this, msg.content);
   }
   
-  handleNextPage(page:Page){
+  //==== Observers ====
+  
+  // observeMsg(msg:Message){
+  // }
+  
+  // setMessengerObserver(){
+  //   const observeMsg = this.observeMsg.bind(this);
+  //   const messenger$ = this.messengerService.getMessenger$();
+  //   messenger$.subscribe(observeMsg);
+  //   return this;
+  // }
+  
+  observeNextPage(page:Page){
     let chars = <Char[]>page.data;
     chars = <Char[]>[...this.chars$.getValue(), ...chars]; // NOTE merging
     
     this.chars$.next(chars);
   }
   
+  setPageObserver(){
+    this.charsPage$.subscribe({
+      next: this.observeNextPage.bind(this),
+      error: console.log,
+      complete: ()=>console.log('Complete')
+    });
+    return this;
+  }
+  
   //==== Methods ====
   
   fetchCharsPageByIndex(pageIndex:number){
     this.store.dispatch(fetchCharsPage({pageIndex}));
+    this.resultsNum += DisneyAPIService.resultsNumPerPage;
     return this;
   }
   
-  observeMessenger(){
-    const handleMessage = this.handleMessage.bind(this);
-    const messenger$ = this.messengerService.getMessenger$();
-    messenger$.subscribe(handleMessage);
+  updateSelChar(char:Char|undefined){
+    this.selChar = char;
     return this;
   }
   
-  observePage(){
-    this.charsPage$.subscribe({
-      next: this.handleNextPage.bind(this),
-      error: console.log,
-      complete: ()=>console.log('Complete')
-    });
+  static readonly handlerPerMsg: HandlerPerMsg = {
+    charSelected: 'updateSelChar',
+    nextPage: 'fetchCharsPageByIndex'
+  };
+  static assignHandlersForMsgs(){ // TODO move to helper service
+    let handlerPerMsg = AppComponent.handlerPerMsg;
+    for (let msgName in handlerPerMsg) {
+      const handlerName = <string>handlerPerMsg[msgName];
+      handlerPerMsg[msgName] = (<any>AppComponent.prototype)[handlerName];
+    }
   }
 }

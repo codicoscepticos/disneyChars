@@ -1,8 +1,7 @@
-import { Component, Input } from '@angular/core';
-import { Router } from "@angular/router";
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { StateService } from 'src/app/services/state.service';
 import { Char } from 'src/app/interfaces/Char';
+import { Message } from 'src/app/interfaces/Message';
 
 @Component({
   selector: 'app-char-row',
@@ -10,22 +9,15 @@ import { Char } from 'src/app/interfaces/Char';
   styleUrls: ['./char-row.component.css']
 })
 export class CharRowComponent {
-  @Input() char:Char = {} as Char;
+  @Input() char = <Char>{};
+  @Output() onMsg = new EventEmitter<Message>();
   
-  constructor(private router:Router, private stateService:StateService){
-    console.log(this.char);
-  }
+  constructor(){}
   
   //==== DOM Events ====
   
   onClick(evt:MouseEvent){
-    this.displayCharPage();
-  }
-  
-  //==== Methods ====
-  
-  displayCharPage(){
-    this.stateService.updateSelectedChar(this.char);
-    this.router.navigate(['char']);
+    const msg = <Message>{name: 'charSelected', content: this.char};
+    this.onMsg.emit(msg);
   }
 }
