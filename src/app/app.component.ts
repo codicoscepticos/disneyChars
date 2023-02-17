@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
 import * as Highcharts from 'highcharts';
 import { BehaviorSubject } from 'rxjs';
 
@@ -22,9 +22,11 @@ import { Char } from './interfaces/Char';
 import { Page } from './interfaces/Page';
 
 import { DisneyAPIService } from './services/disney-api.service';
-import { MessengerService } from './services/messenger.service';
+// import { MessengerService } from './services/messenger.service';
 import { Message } from './interfaces/Message';
 import { HandlerPerMsg } from './interfaces/HandlerPerMsg';
+
+import { CharsComponent } from './chars/chars.component';
 
 @Component({
   selector: 'app-root',
@@ -32,16 +34,19 @@ import { HandlerPerMsg } from './interfaces/HandlerPerMsg';
   styleUrls: ['./app.component.css']
 })
 export class AppComponent {
+  @ViewChild(CharsComponent) private charsComponent!:CharsComponent;
+  
   constructor(
-    private messengerService:MessengerService,
+    // private messengerService:MessengerService,
     private store: Store<AppState>
   ){
     AppComponent.assignHandlersForMsgs();
   }
   
+  ngAfterViewInit(){}
+  
   chars$ = new BehaviorSubject<Char[]>([]);
   charsPage$ = this.store.select(selectCharsPage); // RETHINK Maybe move inside observePage
-  maxPageIndex:number = Infinity;
   resultsNum:number = 0;
   selChar:Char|undefined = undefined;
   
@@ -58,9 +63,6 @@ export class AppComponent {
   }
   handleCharSelected(char:Char|undefined){
     this.updateSelChar(char);
-  }
-  handleGetMaxPageIndex(maxPageIndex$:BehaviorSubject<number>){
-    maxPageIndex$.next(3);//this.maxPageIndex
   }
   handlePageTurned(pageIndex:number){
     const startIndex = DisneyAPIService.resultsNumPerPage * (pageIndex - 1);
@@ -86,7 +88,7 @@ export class AppComponent {
     this.chars$.next(chars);
     
     this.resultsNum += page.count;
-    this.maxPageIndex = page.totalPages; // RETHINK Could possibly move the property to the child and call a child's method to update it.
+    this.charsComponent.updateMaxPageIndex(page.totalPages);
   }
   
   setPageObserver(){
@@ -112,7 +114,6 @@ export class AppComponent {
   
   static readonly handlerPerMsg: HandlerPerMsg = {
     charSelected: 'handleCharSelected',
-    getMaxPageIndex: 'handleGetMaxPageIndex',
     pageTurned: 'handlePageTurned'
   };
   static assignHandlersForMsgs(){ // TODO move to helper service

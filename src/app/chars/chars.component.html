@@ -1,9 +1,7 @@
 <button (click)="onPageByDiff(-1)" [disabled]="pageIndex < 2">Previous Page</button>
-<ng-container *ngIf="askMaxPageIndex$() | async as maxPageIndex">
-    <button (click)="onPageByDiff(1)" [disabled]="pageIndex >= maxPageIndex">
-        Next Page
-    </button>
-</ng-container>
+<button (click)="onPageByDiff(1)" [disabled]="pageIndex >= maxPageIndex">
+    Next Page
+</button>
 <div>
     <span>Name</span>
     <span># TV Shows</span>

@@ -16,6 +16,7 @@ export class CharsComponent {
   
   constructor(){}
   
+  maxPageIndex:number = Infinity;
   pageIndex:number = 1; // NOTE Changes according if going to prev or next page.
   resultsNumPerPage:number = 50; // TODO To be changed by the user. // NOTE If num of chars is less than the selected results per page of the app, should fetch the rest of the pages, and display accordingly.
   resultsIndexes:number[] = this.generateIndexes(); // TODO update also every time the user changes the results per page of the app
@@ -37,13 +38,6 @@ export class CharsComponent {
     if (!handler) this.onMsg.emit(msg);
   }
   
-  askMaxPageIndex$(){
-    let maxPageIndex$ = new BehaviorSubject<number>(Infinity);
-    const msg = <Message>{name: 'getMaxPageIndex', content: maxPageIndex$};
-    this.onMsg.emit(msg);
-    return maxPageIndex$;
-  }
-  
   //==== Methods ====
   
   generateIndexes(){ // RETHINK Maybe move to a helper service.
@@ -58,6 +52,10 @@ export class CharsComponent {
     }
     
     return indexes;
+  }
+  
+  updateMaxPageIndex(index:number){
+    this.maxPageIndex = index;
   }
   
   static readonly handlerPerMsg: HandlerPerMsg = {};
