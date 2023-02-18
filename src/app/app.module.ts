@@ -1,4 +1,5 @@
 import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
 import { HttpClientModule } from '@angular/common/http';
 import { HighchartsChartModule } from 'highcharts-angular';
@@ -26,6 +27,7 @@ import { MessengerService } from './services/messenger.service';
   ],
   imports: [
     BrowserModule,
+    FormsModule,
     HttpClientModule,
     HighchartsChartModule,
     StoreModule.forRoot({ charsPage: charsPageReducer }),

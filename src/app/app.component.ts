@@ -47,6 +47,7 @@ export class AppComponent {
   
   chars$ = new BehaviorSubject<Char[]>([]);
   charsPage$ = this.store.select(selectCharsPage); // RETHINK Maybe move inside observePage
+  lastFetchedPageIndex:number = 0;
   resultsNum:number = 0;
   selChar:Char|undefined = undefined;
   
@@ -55,26 +56,10 @@ export class AppComponent {
     this.setPageObserver().fetchCharsPageByIndex(1);
   }
   
-  //==== Message Handler (for child) ====
-  
-  handleMsg(msg:Message){
-    const handler = <Function>AppComponent.handlerPerMsg[msg.name];
-    if (handler) handler.call(this, msg.content);
-  }
-  handleCharSelected(char:Char|undefined){
-    this.updateSelChar(char);
-  }
-  handlePageTurned(pageIndex:number){
-    const startIndex = DisneyAPIService.resultsNumPerPage * (pageIndex - 1);
-    const endIndex = this.resultsNum - 1;
-    if (startIndex > endIndex) this.fetchCharsPageByIndex(pageIndex);
-  }
-  
   //==== Observers ====
   
   // observeMsg(msg:Message){
   // }
-  
   // setMessengerObserver(){
   //   const observeMsg = this.observeMsg.bind(this);
   //   const messenger$ = this.messengerService.getMessenger$();
@@ -90,7 +75,6 @@ export class AppComponent {
     this.resultsNum += page.count;
     this.charsComponent.updateMaxPageIndex(page.totalPages);
   }
-  
   setPageObserver(){
     this.charsPage$.subscribe({
       next: this.observeNextPage.bind(this),
@@ -103,8 +87,16 @@ export class AppComponent {
   //==== Methods ====
   
   fetchCharsPageByIndex(pageIndex:number){
+    this.lastFetchedPageIndex = pageIndex;
     this.store.dispatch(fetchCharsPage({pageIndex}));
     return this;
+  }
+  
+  fetchCharsPages(num:number){
+    const lastFetchedPageIndex = this.lastFetchedPageIndex;
+    for (let i = 1; i <= num; i += 1) {
+      this.fetchCharsPageByIndex(lastFetchedPageIndex + i);
+    }
   }
   
   updateSelChar(char:Char|undefined){
@@ -112,9 +104,46 @@ export class AppComponent {
     return this;
   }
   
+  //==== Messaging ====
+  
+  handleMsg(msg:Message){ // Message Handler (for child)
+    const handler = <Function>AppComponent.handlerPerMsg[msg.name];
+    if (handler) handler.call(this, msg.content);
+  }
+  handleCharSelected(char:Char|undefined){
+    this.updateSelChar(char);
+  }
+  handlePageTurned(pageIndex:number){
+    let charsComponent = this.charsComponent;
+    
+    let resultsNum = this.resultsNum;
+    let startIndex = (pageIndex - 1) * charsComponent.getResultsNumPerPage();
+    const endIndex = resultsNum - 1;
+    const hasSufficientResults = (resultsNum - startIndex >= charsComponent.resultsNumPerPage); // RETHINK if it's the only needed condition
+    if (startIndex <= endIndex && hasSufficientResults) return;
+    
+    const pagesToFetchNum = Math.ceil(charsComponent.resultsNumPerPage / DisneyAPIService.resultsNumPerPage);
+    this.fetchCharsPages(pagesToFetchNum);
+  }
+  handleResultsNumPerPageChanged({oldResultsNumPerPage, newResultsNumPerPage} // RETHINK Improve passing of multiple params.
+    :{oldResultsNumPerPage:number, newResultsNumPerPage:number}
+  ){
+    let resultsNum = this.resultsNum;
+    
+    const newResultsNum = Math.ceil(resultsNum / newResultsNumPerPage) * newResultsNumPerPage;
+    const pagesToFetchNum = (newResultsNum - resultsNum) / DisneyAPIService.resultsNumPerPage;
+    this.fetchCharsPages(pagesToFetchNum);
+    
+    let charsComponent = this.charsComponent;
+    let pageIndex = charsComponent.getPageIndex();
+    pageIndex = Math.floor((pageIndex - 1) * (oldResultsNumPerPage / newResultsNumPerPage) + 1);
+    charsComponent.updateResultsNumPerPage(newResultsNumPerPage).updatePageIndex(pageIndex);
+  }
+  
   static readonly handlerPerMsg: HandlerPerMsg = {
     charSelected: 'handleCharSelected',
-    pageTurned: 'handlePageTurned'
+    pageTurned: 'handlePageTurned',
+    resultsNumPerPageChanged: 'handleResultsNumPerPageChanged'
   };
   static assignHandlersForMsgs(){ // TODO move to helper service
     let handlerPerMsg = AppComponent.handlerPerMsg;

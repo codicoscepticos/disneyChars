@@ -16,26 +16,31 @@ export class CharsComponent {
   
   constructor(){}
   
+  initialResultsNumPerPage:number = 50;
   maxPageIndex:number = Infinity;
   pageIndex:number = 1; // NOTE Changes according if going to prev or next page.
-  resultsNumPerPage:number = 50; // TODO To be changed by the user. // NOTE If num of chars is less than the selected results per page of the app, should fetch the rest of the pages, and display accordingly.
-  resultsIndexes:number[] = this.generateIndexes(); // TODO update also every time the user changes the results per page of the app
+  resultsIndexes:number[] = [];
+  resultsNumPerPage:number = 50; // NOTE Updated via the dropdown menu.
+  selectorOptions:number[] = [10, 20, 50, 100, 200, 500];
+  
+  ngOnInit(){
+    this.resultsIndexes = this.generateIndexes();
+  }
   
   //==== DOM Events ====
   
-  onPageByDiff(diff:number){
-    this.pageIndex += diff;
-    this.resultsIndexes = this.generateIndexes();
-    
-    const msg = <Message>{name: 'pageTurned', content: this.pageIndex};
-    this.onMsg.emit(msg);
+  onOptionChanged(resultsNumPerPage:any){
+    const content = {
+      oldResultsNumPerPage: this.resultsNumPerPage,
+      newResultsNumPerPage: resultsNumPerPage
+    };
+    this.sendMsg('resultsNumPerPageChanged', content);
   }
   
-  //==== Message Handler (for child) ====
-  
-  handleMsg(msg:Message){
-    const handler = <Function>CharsComponent.handlerPerMsg[msg.name];
-    if (!handler) this.onMsg.emit(msg);
+  onPageByDiff(diff:number){
+    let pageIndex = this.pageIndex + diff;
+    this.updatePageIndex(pageIndex);
+    this.sendMsg('pageTurned', pageIndex);
   }
   
   //==== Methods ====
@@ -54,8 +59,38 @@ export class CharsComponent {
     return indexes;
   }
   
+  getPageIndex(){
+    return this.pageIndex;
+  }
+  
+  getResultsNumPerPage(){
+    return this.resultsNumPerPage;
+  }
+  
   updateMaxPageIndex(index:number){
     this.maxPageIndex = index;
+  }
+  
+  updatePageIndex(index:number){
+    this.pageIndex = index;
+    this.resultsIndexes = this.generateIndexes();
+  }
+  
+  updateResultsNumPerPage(resultsNumPerPage:number){
+    this.resultsNumPerPage = resultsNumPerPage;
+    return this;
+  }
+  
+  //==== Messaging ====
+  
+  handleMsg(msg:Message){ // Message Handler (for child)
+    const handler = <Function>CharsComponent.handlerPerMsg[msg.name];
+    if (!handler) this.onMsg.emit(msg);
+  }
+  
+  sendMsg(name:string, content:any){ // TODO Should become a shared method between components.
+    const msg = <Message>{name, content};
+    this.onMsg.emit(msg);
   }
   
   static readonly handlerPerMsg: HandlerPerMsg = {};

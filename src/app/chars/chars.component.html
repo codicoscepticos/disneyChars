@@ -1,4 +1,8 @@
+<select [ngModel]="initialResultsNumPerPage" (ngModelChange)="onOptionChanged($event)">
+    <option *ngFor="let option of selectorOptions" [ngValue]="option">{{ option }}</option>
+</select>
 <button (click)="onPageByDiff(-1)" [disabled]="pageIndex < 2">Previous Page</button>
+<span>{{ pageIndex }}</span>
 <button (click)="onPageByDiff(1)" [disabled]="pageIndex >= maxPageIndex">
     Next Page
 </button>
