@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
 import { Char } from '../interfaces/Char';
@@ -8,13 +8,16 @@ import { Message } from '../interfaces/Message';
 @Component({
   selector: 'app-chars',
   templateUrl: './chars.component.html',
-  styleUrls: ['./chars.component.css']
+  styleUrls: ['./chars.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CharsComponent {
   @Input() chars$ = new BehaviorSubject<Char[]>([]);
   @Output() onMsg = new EventEmitter<Message>();
   
   constructor(){}
+  
+  readonly headerCellNames = ['Name', '# TV Shows', '# Video Games', 'Allies', 'Enemies'];
   
   initialResultsNumPerPage:number = 50;
   maxPageIndex:number = Infinity;

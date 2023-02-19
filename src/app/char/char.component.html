@@ -1,1 +1,18 @@
-<p>Char's name is {{ char.name }}</p>
+<div class="char-header">
+    <h1>{{ char.name }}</h1>
+    <img [src]="char.imageUrl" [alt]="char.name" />
+</div>
+<div class="char-media">
+    <div *ngIf="char.tvShows.length > 0">
+        <h3>TV Shows:</h3>
+        <ng-container *ngFor="let tvShow of char.tvShows">
+            <li>{{ tvShow }}</li>
+        </ng-container>
+    </div>
+    <div *ngIf="char.videoGames.length > 0">
+        <h3>Video Games:</h3>
+        <ng-container *ngFor="let videoGame of char.videoGames">
+            <li>{{ videoGame }}</li>
+        </ng-container>
+    </div>
+</div>

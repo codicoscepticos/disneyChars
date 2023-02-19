@@ -1,10 +1,17 @@
-div {
-    display: flex;
-    justify-content: flex-start;
-    align-items: flex-start;
-    flex-direction: row;
+.char-row-root {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
 }
 
-div > span {
-    padding: 4px;
+.char-row-cell {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    text-align: center;
+}
+
+.char-row-ally,
+.char-row-enemy {
+    border-bottom: 1px solid #33553355;
 }

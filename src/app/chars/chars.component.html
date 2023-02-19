@@ -1,20 +1,26 @@
-<select [ngModel]="initialResultsNumPerPage" (ngModelChange)="onOptionChanged($event)">
-    <option *ngFor="let option of selectorOptions" [ngValue]="option">{{ option }}</option>
-</select>
-<button (click)="onPageByDiff(-1)" [disabled]="pageIndex < 2">Previous Page</button>
-<span>{{ pageIndex }}</span>
-<button (click)="onPageByDiff(1)" [disabled]="pageIndex >= maxPageIndex">
-    Next Page
-</button>
-<div>
-    <span>Name</span>
-    <span># TV Shows</span>
-    <span># Video Games</span>
-    <span>Allies</span>
-    <span>Enemies</span>
-</div>
-<ng-container *ngIf="chars$ | async as chars">
-    <ng-container *ngFor="let i of resultsIndexes">
-        <app-char-row [char]="chars[i]" (onMsg)="handleMsg($event)"></app-char-row>
+<div class="chars-header">
+    <ng-container *ngFor="let name of headerCellNames; let i = index">
+            <span class="{{
+                ((i < headerCellNames.length - 1) && 'chars-headerCell') || 'chars-lastHeaderCell'
+            }}">
+                {{ name }}
+            </span>
     </ng-container>
+</div>
+
+<ng-container *ngIf="chars$ | async as chars">
+    <div class="chars-results scrollbar">
+        <ng-container *ngFor="let i of resultsIndexes">
+            <app-char-row [char]="chars[i]" (onMsg)="handleMsg($event)"></app-char-row>
+        </ng-container>
+    </div>
 </ng-container>
+
+<div class="chars-controls">
+    <select class="chars-resultsSelector" [ngModel]="initialResultsNumPerPage" (ngModelChange)="onOptionChanged($event)">
+        <option *ngFor="let option of selectorOptions" [ngValue]="option">{{ option }}</option>
+    </select>
+    <button class="chars-btnPage" (click)="onPageByDiff(-1)" [disabled]="pageIndex < 2">◀</button>
+    <span class="chars-pageIndex">{{ pageIndex }}</span>
+    <button class="chars-btnPage" (click)="onPageByDiff(1)">▶</button> <!-- TODO fix condition [disabled]="pageIndex >= maxPageIndex"-->
+</div>

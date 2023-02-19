@@ -1,0 +1,47 @@
+.app-root {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-header {
+    flex-grow: 2;
+}
+
+.app-header h1 {
+    font-family: "Waltograph", sans-serif;
+    font-size: 4rem;
+    color: #000000;
+}
+
+.app-modals {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    flex-grow: 8;
+    padding-left: 4px;
+    padding-right: 4px;
+}
+
+.app-charsModal {
+    color: #000000e6;
+    font-family: "Avenir Next LT Pro", sans-serif;
+    flex: 1 0 60vw;
+}
+
+.app-charModal {
+    color: #000000e6;
+    flex: 1 0 20vw;
+    font-family: "Avenir Next LT Pro", sans-serif;
+    height: 480px;
+    margin-top: 18px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding-left: 28px;
+    padding: 4px;
+    width: 300px;
+    border-top: 1px solid;
+    border-bottom: 1px solid;
+    border-right: 1px solid;
+    border-radius: 8px;
+}

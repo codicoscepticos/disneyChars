@@ -1,4 +1,13 @@
-<app-chars [chars$]="chars$" (onMsg)="handleMsg($event)"></app-chars>
-<ng-container *ngIf="selChar !== undefined">
-    <app-char [char]="selChar"></app-char>
-</ng-container>
+<div class="app-root">
+    <div class="app-header">
+        <h1>DISNEY CHARACTERS</h1>
+    </div>
+    <div class="app-modals">
+        <app-chars class="app-charsModal" [chars$]="chars$" (onMsg)="handleMsg($event)"></app-chars>
+        <div class="app-charModal scrollbar">
+            <ng-container *ngIf="selChar !== undefined">
+                <app-char [char]="selChar"></app-char>
+            </ng-container>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,64 @@
+.chars-header {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+}
+
+.chars-headerCell,
+.chars-lastHeaderCell {
+    border-right: 1px solid #000;
+    padding-left: 2px;
+    text-align: center;
+}
+.chars-lastHeaderCell {
+    border-right: none;
+}
+
+.chars-results {
+    height: 480px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    border: 1px solid #000;
+    border-radius: 8px;
+    padding: 4px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.chars-results :nth-child(odd) div {
+    background-color: #f2f2f2;
+}
+.chars-results :nth-child(even) div {
+    background-color: #fff;
+}
+
+.chars-results :nth-child(n) div:hover {
+    background-color: #d3d3d3;
+    cursor: pointer;
+}
+
+.chars-controls {
+    padding-top: 4px;
+    padding-left: 12px;
+    display: flex;
+    flex-direction: row;
+    gap: 10px;
+}
+
+.chars-resultsSelector {
+    border-radius: 6px;
+}
+
+.chars-btnPage {
+    background-color: #fff;
+    border: 1px solid #000;
+    border-radius: 4px;
+}
+
+.chars-pageIndex {
+    border: 1px solid;
+    border-radius: 4px;
+    padding-left: 6px;
+    padding-right: 6px;
+    text-align: center;
+}
