@@ -2,6 +2,7 @@
     <div class="app-header">
         <h1>DISNEY CHARACTERS</h1>
     </div>
+    
     <div class="app-modals">
         <app-chars class="app-charsModal" [chars$]="chars$" (onMsg)="handleMsg($event)"></app-chars>
         <div class="app-charModal scrollbar">
@@ -10,4 +11,6 @@
             </ng-container>
         </div>
     </div>
+    
+    <app-pie-chart></app-pie-chart>
 </div>

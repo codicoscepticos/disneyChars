@@ -27,7 +27,7 @@ export class CharsComponent {
   selectorOptions:number[] = [10, 20, 50, 100, 200, 500];
   
   ngOnInit(){
-    this.resultsIndexes = this.generateIndexes();
+    this.updateResultsIndexes();
   }
   
   //==== DOM Events ====
@@ -42,7 +42,7 @@ export class CharsComponent {
   
   onPageByDiff(diff:number){
     let pageIndex = this.pageIndex + diff;
-    this.updatePageIndex(pageIndex);
+    this.updatePageIndex(pageIndex).updateResultsIndexes();
     this.sendMsg('pageTurned', pageIndex);
   }
   
@@ -70,12 +70,20 @@ export class CharsComponent {
     return this.resultsNumPerPage;
   }
   
+  getResultsIndexes(){
+    return this.resultsIndexes;
+  }
+  
   updateMaxPageIndex(index:number){
     this.maxPageIndex = index;
   }
   
   updatePageIndex(index:number){
     this.pageIndex = index;
+    return this;
+  }
+  
+  updateResultsIndexes(){
     this.resultsIndexes = this.generateIndexes();
   }
   

@@ -7,10 +7,10 @@ import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 
 import { AppComponent } from './app.component';
-
-import { CharsComponent } from './chars/chars.component';
-import { CharRowComponent } from './chars/char-row/char-row.component';
 import { CharComponent } from './char/char.component';
+import { CharRowComponent } from './chars/char-row/char-row.component';
+import { CharsComponent } from './chars/chars.component';
+import { PieChartComponent } from './pie-chart/pie-chart.component';
 
 import { charsPageReducer } from './state/state.reducers';
 import { CharsPageEffects } from './state/state.effects';
@@ -23,7 +23,8 @@ import { MessengerService } from './services/messenger.service';
     AppComponent,
     CharsComponent,
     CharRowComponent,
-    CharComponent
+    CharComponent,
+    PieChartComponent
   ],
   imports: [
     BrowserModule,

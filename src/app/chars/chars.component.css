@@ -5,7 +5,7 @@
 
 .chars-headerCell,
 .chars-lastHeaderCell {
-    border-right: 1px solid #000;
+    border-right: 1px solid #0000005e;
     padding-left: 2px;
     text-align: center;
 }
@@ -14,15 +14,16 @@
 }
 
 .chars-results {
-    height: 480px;
-    overflow-y: auto;
-    overflow-x: hidden;
-    border: 1px solid #000;
     border-radius: 8px;
-    padding: 4px;
+    border-top: 0;
+    box-shadow: 0 1px 4px 0 #0000005e;
     display: flex;
     flex-direction: column;
     gap: 2px;
+    height: 480px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 4px;
 }
 
 .chars-results :nth-child(odd) div {
@@ -33,7 +34,7 @@
 }
 
 .chars-results :nth-child(n) div:hover {
-    background-color: #d3d3d3;
+    background-color: #e5e5e5;
     cursor: pointer;
 }
 
@@ -46,19 +47,26 @@
 }
 
 .chars-resultsSelector {
-    border-radius: 6px;
+    border: 1px solid #0000001f;
+    border-radius: 24%;
+    cursor: pointer;
 }
 
 .chars-btnPage {
     background-color: #fff;
-    border: 1px solid #000;
-    border-radius: 4px;
+    border: 1px solid #0000001f;
+    border-radius: 40%;
+    cursor: pointer;
+}
+.chars-btnPage:disabled {
+    cursor: default;
 }
 
 .chars-pageIndex {
-    border: 1px solid;
-    border-radius: 4px;
+    border: 1px solid #0000001f;
+    border-radius: 40%;
     padding-left: 6px;
     padding-right: 6px;
     text-align: center;
+    cursor: default;
 }

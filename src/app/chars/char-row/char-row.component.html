@@ -1,15 +1,17 @@
-<div class="char-row-root" (click)="onClick($event)">
-    <span class="char-row-cell">{{ char.name }}</span>
-    <span class="char-row-cell">{{ char.tvShows.length }}</span>
-    <span class="char-row-cell">{{ char.videoGames.length }}</span>
-    <span class="char-row-cell">
-        <ng-container *ngFor="let allyName of char.allies">
-            <span class="char-row-ally">{{ allyName }}</span>
-        </ng-container>
-    </span>
-    <span class="char-row-cell">
-        <ng-container *ngFor="let enemyName of char.enemies">
-            <span class="char-row-enemy">{{ enemyName }}</span>
-        </ng-container>
-    </span>
-</div>
+<ng-container *ngIf="char">
+    <div class="char-row-root" (click)="onClick($event)">
+        <span class="char-row-cell">{{ char.name }}</span>
+        <span class="char-row-cell">{{ char.tvShows.length }}</span>
+        <span class="char-row-cell">{{ char.videoGames.length }}</span>
+        <span class="char-row-cell">
+            <ng-container *ngFor="let allyName of char.allies">
+                <span class="char-row-ally">{{ allyName }}</span>
+            </ng-container>
+        </span>
+        <span class="char-row-cell">
+            <ng-container *ngFor="let enemyName of char.enemies">
+                <span class="char-row-enemy">{{ enemyName }}</span>
+            </ng-container>
+        </span>
+    </div>
+</ng-container>

@@ -30,6 +30,9 @@
 }
 
 .app-charModal {
+    border-radius: 8px;
+    border-top: 0;
+    box-shadow: 0 1px 4px 0 #0000005e;
     color: #000000e6;
     flex: 1 0 20vw;
     font-family: "Avenir Next LT Pro", sans-serif;
@@ -40,8 +43,4 @@
     padding-left: 28px;
     padding: 4px;
     width: 300px;
-    border-top: 1px solid;
-    border-bottom: 1px solid;
-    border-right: 1px solid;
-    border-radius: 8px;
 }
