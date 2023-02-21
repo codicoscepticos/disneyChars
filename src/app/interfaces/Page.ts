@@ -4,4 +4,4 @@ export interface Page{
     nextPage:string,
     prevPage:string,
     totalPages:number
-};
+}

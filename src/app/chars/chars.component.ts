@@ -22,6 +22,7 @@ export class CharsComponent {
   initialResultsNumPerPage:number = 50;
   maxPageIndex:number = Infinity;
   pageIndex:number = 1; // NOTE Changes according if going to prev or next page.
+  prevPageIndex:number = 1;
   resultsIndexes:number[] = [];
   resultsNumPerPage:number = 50; // NOTE Updated via the dropdown menu.
   selectorOptions:number[] = [10, 20, 50, 100, 200, 500];
@@ -48,7 +49,7 @@ export class CharsComponent {
   
   //==== Methods ====
   
-  generateIndexes(){ // RETHINK Maybe move to a helper service.
+  generateIndexes(){ // RETHINK Maybe move to a helper service. Take into consideration resultsNum?
     let indexes = [];
     
     let pageIndex = this.pageIndex;
@@ -83,6 +84,16 @@ export class CharsComponent {
     return this;
   }
   
+  updatePageIndexToPrev(){
+    this.pageIndex = this.prevPageIndex;
+    return this;
+  }
+  
+  updatePrevPageIndex(){
+    this.prevPageIndex = this.pageIndex;
+    return this;
+  }
+  
   updateResultsIndexes(){
     this.resultsIndexes = this.generateIndexes();
   }
@@ -99,7 +110,7 @@ export class CharsComponent {
     if (!handler) this.onMsg.emit(msg);
   }
   
-  sendMsg(name:string, content:any){ // TODO Should become a shared method between components.
+  sendMsg(name:string, content?:any){ // TODO Should become a shared method between components.
     const msg = <Message>{name, content};
     this.onMsg.emit(msg);
   }

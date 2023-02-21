@@ -5,6 +5,7 @@ import { Store } from '@ngrx/store';
 import {
   // [Disney API]
   fetchCharsPage,
+  fetchSearchCharsPage,
   // [Chars]
   displayNextPage,
   displayPrevPage,
@@ -14,13 +15,15 @@ import {
   // [Char Row]
   displayCharPage
 } from './state/state.actions';
-import { selectCharsPage } from './state/state.selectors';
+import { selectCharsPage, selectSearchCharsPage } from './state/state.selectors';
 
+import { AppMode } from './interfaces/AppMode';
 import { AppState } from './interfaces/AppState';
 import { Char } from './interfaces/Char';
 import { HandlerPerMsg } from './interfaces/HandlerPerMsg';
 import { Message } from './interfaces/Message';
 import { Page } from './interfaces/Page';
+import { SearchPage } from './interfaces/SearchPage';
 
 import { DisneyAPIService } from './services/disney-api.service';
 // import { MessengerService } from './services/messenger.service';
@@ -47,16 +50,22 @@ export class AppComponent {
   ngAfterViewInit(){}
   
   chars$ = new BehaviorSubject<Char[]>([]);
-  charsPage$ = this.store.select(selectCharsPage); // RETHINK Maybe move inside observePage
+  charsPage$ = this.store.select(selectCharsPage); // RETHINK This and below maybe move inside observePage
+  searchChars$ = new BehaviorSubject<Char[]>([]);
+  searchCharsPage$ = this.store.select(selectSearchCharsPage);
+  
   lastFetchedPageIndex:number = 0;
   maxFetchedPageIndex:number = 0;
+  mode:AppMode = 'default';
   resultsNum:number = 0;
   selChar:Char|undefined = undefined;
   
   ngOnInit(){
     // this.setMessengerObserver();
+    this.setPageObserver().setSearchPageObserver();
+    
     this.maxFetchedPageIndex = 1;
-    this.setPageObserver().fetchCharsPageByIndex(1);
+    this.fetchCharsPageByIndex(1);
   }
   
   //==== Observers ====
@@ -78,7 +87,7 @@ export class AppComponent {
     chars = <Char[]>[...chars$.getValue(), ...chars]; // NOTE merging
     chars$.next(chars);
     
-    this.resultsNum += page.count;
+    this.resultsNum = chars.length;
     
     const charsComponent = this.charsComponent;
     if (charsComponent) charsComponent.updateMaxPageIndex(page.totalPages); // RETHINK ensure charsComponent
@@ -92,6 +101,26 @@ export class AppComponent {
   setPageObserver(){
     this.charsPage$.subscribe({
       next: this.observeNextPage.bind(this),
+      error: console.log,
+      complete: ()=>console.log('Complete')
+    });
+    return this;
+  }
+  
+  observeSearchPage(page:SearchPage){
+    let searchChars = <Char[]>page.data;
+    this.searchChars$.next(searchChars);
+    
+    this.resultsNum = searchChars.length;
+    
+    let charsComponent = this.charsComponent;
+    if (charsComponent) charsComponent.updateResultsIndexes(); // RETHINK ensure charsComponent
+    
+    this.updateChartData();
+  }
+  setSearchPageObserver(){
+    this.searchCharsPage$.subscribe({
+      next: this.observeSearchPage.bind(this),
       error: console.log,
       complete: ()=>console.log('Complete')
     });
@@ -116,9 +145,14 @@ export class AppComponent {
     }
   }
   
-  getCharsByIndexes(indexes:number[]){
-    let chars:Char[] = this.chars$.getValue();
-    return indexes.map(i=>chars[i]);
+  fetchSearchCharsPageByIndex(query:string){
+    this.store.dispatch(fetchSearchCharsPage({query}));
+    return this;
+  }
+  
+  getCharsByIndexes(chars$:BehaviorSubject<Char[]>, indexes:number[]){
+    let chars:Char[] = chars$.getValue();
+    return indexes.map(i=>chars[i]).filter(c=>c); // TODO generateIndexes to consider resultsNum (remove filter when ready)
   }
   
   updateChartData(){
@@ -126,7 +160,8 @@ export class AppComponent {
     if (!charsComponent) return; // RETHINK ensure charsComponent
     
     const resultsIndexes = charsComponent.getResultsIndexes();
-    const chars = this.getCharsByIndexes(resultsIndexes);
+    const chars$ = (this.mode === 'search') ? this.searchChars$ : this.chars$; // RETHINK implementation
+    const chars = this.getCharsByIndexes(chars$, resultsIndexes);
     this.pieChartComponent.updateChartData(chars);
   }
   
@@ -162,8 +197,6 @@ export class AppComponent {
   handleResultsNumPerPageChanged({oldResultsNumPerPage, newResultsNumPerPage} // RETHINK Improve passing of multiple params.
     :{oldResultsNumPerPage:number, newResultsNumPerPage:number}
   ){
-    
-    
     let charsComponent = this.charsComponent;
     let pageIndex = charsComponent.getPageIndex();
     pageIndex = Math.floor((pageIndex - 1) * (oldResultsNumPerPage / newResultsNumPerPage) + 1);
@@ -181,11 +214,25 @@ export class AppComponent {
     
     this.fetchCharsPages(pagesToFetchNum);
   }
+  handleSearchInputCleared(){
+    this.mode = 'default';
+    this.searchChars$.next([]);
+    this.resultsNum = this.chars$.getValue().length;
+    this.charsComponent.updatePageIndexToPrev().updateResultsIndexes();
+    this.updateChartData();
+  }
+  handleSearchInputSubmitted(query:string){
+    this.mode = 'search';
+    this.charsComponent.updatePrevPageIndex().updatePageIndex(1);
+    this.fetchSearchCharsPageByIndex(query);
+  }
   
   static readonly handlerPerMsg: HandlerPerMsg = {
     charSelected: 'handleCharSelected',
     pageTurned: 'handlePageTurned',
-    resultsNumPerPageChanged: 'handleResultsNumPerPageChanged'
+    resultsNumPerPageChanged: 'handleResultsNumPerPageChanged',
+    searchInputCleared: 'handleSearchInputCleared',
+    searchInputSubmitted: 'handleSearchInputSubmitted'
   };
   static assignHandlersForMsgs(){ // TODO move to helper service
     let handlerPerMsg = AppComponent.handlerPerMsg;

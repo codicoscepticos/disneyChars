@@ -12,11 +12,12 @@ import { CharRowComponent } from './chars/char-row/char-row.component';
 import { CharsComponent } from './chars/chars.component';
 import { PieChartComponent } from './pie-chart/pie-chart.component';
 
-import { charsPageReducer } from './state/state.reducers';
+import { charsPageReducer, searchCharsPageReducer } from './state/state.reducers';
 import { CharsPageEffects } from './state/state.effects';
 
 import { DisneyAPIService } from './services/disney-api.service';
 import { MessengerService } from './services/messenger.service';
+import { SearchComponent } from './chars/search/search.component';
 
 @NgModule({
   declarations: [
@@ -24,14 +25,18 @@ import { MessengerService } from './services/messenger.service';
     CharsComponent,
     CharRowComponent,
     CharComponent,
-    PieChartComponent
+    PieChartComponent,
+    SearchComponent
   ],
   imports: [
     BrowserModule,
     FormsModule,
     HttpClientModule,
     HighchartsChartModule,
-    StoreModule.forRoot({ charsPage: charsPageReducer }),
+    StoreModule.forRoot({
+      charsPage: charsPageReducer,
+      searchCharsPage: searchCharsPageReducer
+    }),
     EffectsModule.forRoot([CharsPageEffects])
   ],
   providers: [DisneyAPIService, MessengerService],

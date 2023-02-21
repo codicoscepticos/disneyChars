@@ -1,5 +1,7 @@
 import { createAction, props } from '@ngrx/store';
+
 import { Page } from '../interfaces/Page';
+import { SearchPage } from '../interfaces/SearchPage';
 
 export const displayNextPage = createAction('[Chars] Display Next Page');
 export const displayPrevPage = createAction('[Chars] Display Previous Page');
@@ -22,21 +24,15 @@ export const failFetchingCharsPage = createAction(
     props<{ error:string }>()
 );
 
-// ==== EVENTS ====
-// 1. [Chars] Select number of results
-// 	* change table (model)
-	
-// 2. [Chars] Next page
-// 	* change table (model)
-	
-// 3. [Chars] Previous page
-// 	* change table (model)
-	
-// 4. [Chars] Search/Filter
-// 	* change table (model)
-	
-// 5. [Chars] Click Name category to sort
-// 	* change table (model)
-	
-// 6. [Char-Row] Select/Click a char row
-// 	* navigate to char-page (char selected)
+export const fetchSearchCharsPage = createAction(
+    '[Disney API] Fetch Characters Page For Search',
+    props<{ query:string }>()
+);
+export const succeedFetchingSearchCharsPage = createAction(
+    '[Disney API] Succeed Fetching Chars Page For Search',
+    props<{ searchCharsPage:SearchPage }>()
+);
+export const failFetchingSearchCharsPage = createAction(
+    '[Disney API] Fail Fetching Chars Page For Search',
+    props<{ error:string }>()
+);

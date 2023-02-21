@@ -1,11 +1,21 @@
 import { Injectable } from '@angular/core';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { map, catchError, mergeMap } from 'rxjs/operators';
-import { Page } from '../interfaces/Page';
+import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
+
+import { Actions, createEffect, ofType } from '@ngrx/effects';
+import {
+    failFetchingCharsPage,
+    failFetchingSearchCharsPage,
+    fetchCharsPage,
+    fetchSearchCharsPage,
+    succeedFetchingCharsPage,
+    succeedFetchingSearchCharsPage
+} from './state.actions';
 
 import { DisneyAPIService } from '../services/disney-api.service';
-import { fetchCharsPage, succeedFetchingCharsPage, failFetchingCharsPage } from './state.actions';
+
+import { Page } from '../interfaces/Page';
+import { SearchPage } from '../interfaces/SearchPage';
 
 @Injectable()
 export class CharsPageEffects{
@@ -19,8 +29,24 @@ export class CharsPageEffects{
             ofType(fetchCharsPage),
             mergeMap(
                 ({pageIndex})=>this.disneyAPIService.getCharsPage(pageIndex).pipe(
-                    map(charsPage=>succeedFetchingCharsPage({ charsPage:<Page> charsPage })),
+                    map(charsPage=>succeedFetchingCharsPage({
+                        charsPage:<Page> charsPage
+                    })),
                     catchError(error=>of(failFetchingCharsPage({ error })))
+                )
+            )
+        )
+    );
+    
+    fetchSearchCharsPage$ = createEffect(()=>
+        this.actions$.pipe(
+            ofType(fetchSearchCharsPage),
+            switchMap(
+                ({query})=>this.disneyAPIService.getSearchCharsPage(query).pipe(
+                    map(searchCharsPage=>succeedFetchingSearchCharsPage({
+                        searchCharsPage:<SearchPage> searchCharsPage
+                    })),
+                    catchError(error=>of(failFetchingSearchCharsPage({ error })))
                 )
             )
         )

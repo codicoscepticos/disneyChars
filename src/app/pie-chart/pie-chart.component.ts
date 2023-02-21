@@ -14,24 +14,6 @@ HC_exporting(Highcharts);
 export class PieChartComponent {
   constructor(){}
   
-  static generateChartData(chars:Char[]){
-    let chartData:any[] = [];
-    
-    chars.forEach(function addChartPoint(char:Char){ // TODO Improve implementation.
-      let films:string[] = char.films;
-      let htmlFilms = (films.length > 0) ? '• ' + films.join('<br>• ') : '';
-      
-      const point = [ // TODO ChartPoint interface
-        char.name,
-        films.length,
-        htmlFilms
-      ];
-      chartData.push(point);
-    });
-    
-    return chartData;
-  }
-  
   Highcharts:typeof Highcharts = Highcharts;
   chartOptions:Highcharts.Options = {
     chart: {
@@ -81,6 +63,25 @@ export class PieChartComponent {
   public chart:Highcharts.Chart|null = null;
   
   ngOnInit(){}
+  
+  static generateChartData(chars:Char[]){
+    let chartData:any[] = [];
+    
+    chars.forEach(function addChartPoint(char:Char){ // TODO Improve implementation.
+      let films:string[] = char.films;
+      let filmsLength = films.length;
+      let htmlFilms = (filmsLength > 0) ? '• ' + films.join('<br>• ') : '';
+      
+      const point = [ // TODO ChartPoint interface
+        char.name,
+        filmsLength,
+        htmlFilms
+      ];
+      chartData.push(point);
+    });
+    
+    return chartData;
+  }
   
   chartCallback = (chart:Highcharts.Chart) => {
     if (!this.chart) this.chart = chart;

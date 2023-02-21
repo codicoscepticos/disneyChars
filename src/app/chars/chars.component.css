@@ -47,15 +47,21 @@
 }
 
 .chars-resultsSelector {
-    border: 1px solid #0000001f;
     border-radius: 24%;
+    border: 1px solid #0000001f;
+    box-shadow: 0 1px 4px 0 #0000005e;
     cursor: pointer;
+}
+.chars-resultsSelector:focus {
+    border-color: #e5e5e5;
+    outline: none;
 }
 
 .chars-btnPage {
     background-color: #fff;
-    border: 1px solid #0000001f;
     border-radius: 40%;
+    border: 1px solid #0000001f;
+    box-shadow: 0 1px 4px 0 #0000005e;
     cursor: pointer;
 }
 .chars-btnPage:disabled {
@@ -63,10 +69,11 @@
 }
 
 .chars-pageIndex {
-    border: 1px solid #0000001f;
     border-radius: 40%;
+    border: 1px solid #0000001f;
+    box-shadow: 0 1px 4px 0 #0000005e;
+    cursor: default;
     padding-left: 6px;
     padding-right: 6px;
     text-align: center;
-    cursor: default;
 }

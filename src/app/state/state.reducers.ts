@@ -2,9 +2,12 @@ import { createReducer, on } from '@ngrx/store';
 
 import {
     // [Disney API]
-    fetchCharsPage,
-    succeedFetchingCharsPage,
     failFetchingCharsPage,
+    failFetchingSearchCharsPage,
+    fetchCharsPage,
+    fetchSearchCharsPage,
+    succeedFetchingCharsPage,
+    succeedFetchingSearchCharsPage,
     // [Chars]
     displayNextPage,
     displayPrevPage,
@@ -16,6 +19,7 @@ import {
 } from './state.actions';
 
 import { Page } from '../interfaces/Page';
+import { SearchPage } from '../interfaces/SearchPage';
 
 export const initState:Page = {
     count: 0,
@@ -24,7 +28,6 @@ export const initState:Page = {
     prevPage: '',
     totalPages: 0
 };
-
 export const charsPageReducer = createReducer(
     initState,
     // [Chars]
@@ -39,4 +42,16 @@ export const charsPageReducer = createReducer(
     on(fetchCharsPage, (state)=>state),
     on(succeedFetchingCharsPage, (state, { charsPage })=><Page>charsPage),
     on(failFetchingCharsPage, (state)=>state)
+);
+
+export const initSearchPageState:SearchPage = {
+    count: 0,
+    data: []
+};
+export const searchCharsPageReducer = createReducer(
+    initSearchPageState,
+    // [Disney API]
+    on(fetchSearchCharsPage, (state)=>state),
+    on(succeedFetchingSearchCharsPage, (state, { searchCharsPage })=><SearchPage>searchCharsPage),
+    on(failFetchingSearchCharsPage, (state)=>state)
 );

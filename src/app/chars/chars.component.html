@@ -23,4 +23,5 @@
     <button class="chars-btnPage" (click)="onPageByDiff(-1)" [disabled]="pageIndex < 2">◀</button>
     <span class="chars-pageIndex">{{ pageIndex }}</span>
     <button class="chars-btnPage" (click)="onPageByDiff(1)">▶</button> <!-- TODO fix condition [disabled]="pageIndex >= maxPageIndex"-->
+    <app-search (onMsg)="handleMsg($event)"></app-search>
 </div>
