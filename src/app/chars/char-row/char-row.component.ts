@@ -11,7 +11,7 @@ import { Message } from 'src/app/interfaces/Message';
 })
 export class CharRowComponent {
   @Input() char = <Char>{};
-  @Output() onMsg = new EventEmitter<Message>();
+  @Output() msgSent = new EventEmitter<Message>();
   
   constructor(){}
   
@@ -19,6 +19,6 @@ export class CharRowComponent {
   
   onClick(evt:MouseEvent){
     const msg = <Message>{name: 'charSelected', content: this.char};
-    this.onMsg.emit(msg);
+    this.msgSent.emit(msg);
   }
 }

@@ -13,7 +13,7 @@ import { Message } from '../interfaces/Message';
 })
 export class CharsComponent {
   @Input() chars$ = new BehaviorSubject<Char[]>([]);
-  @Output() onMsg = new EventEmitter<Message>();
+  @Output() msgSent = new EventEmitter<Message>();
   
   constructor(){}
   
@@ -107,12 +107,12 @@ export class CharsComponent {
   
   handleMsg(msg:Message){ // Message Handler (for child)
     const handler = <Function>CharsComponent.handlerPerMsg[msg.name];
-    if (!handler) this.onMsg.emit(msg);
+    if (!handler) this.msgSent.emit(msg);
   }
   
   sendMsg(name:string, content?:any){ // TODO Should become a shared method between components.
     const msg = <Message>{name, content};
-    this.onMsg.emit(msg);
+    this.msgSent.emit(msg);
   }
   
   static readonly handlerPerMsg: HandlerPerMsg = {};

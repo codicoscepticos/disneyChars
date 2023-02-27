@@ -11,7 +11,7 @@
 <ng-container *ngIf="chars$ | async as chars">
     <div class="chars-results scrollbar">
         <ng-container *ngFor="let i of resultsIndexes">
-            <app-char-row [char]="chars[i]" (onMsg)="handleMsg($event)"></app-char-row>
+            <app-char-row [char]="chars[i]" (msgSent)="handleMsg($event)"></app-char-row>
         </ng-container>
     </div>
 </ng-container>
@@ -23,5 +23,5 @@
     <button class="chars-btnPage" (click)="onPageByDiff(-1)" [disabled]="pageIndex < 2">◀</button>
     <span class="chars-pageIndex">{{ pageIndex }}</span>
     <button class="chars-btnPage" (click)="onPageByDiff(1)">▶</button> <!-- TODO fix condition [disabled]="pageIndex >= maxPageIndex"-->
-    <app-search (onMsg)="handleMsg($event)"></app-search>
+    <app-search (msgSent)="handleMsg($event)"></app-search>
 </div>

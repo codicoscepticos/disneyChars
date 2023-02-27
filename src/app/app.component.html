@@ -7,7 +7,7 @@
         <app-chars
             class="app-charsModal"
             [chars$]="(mode === 'search') ? searchChars$ : chars$"
-            (onMsg)="handleMsg($event)"
+            (msgSent)="handleMsg($event)"
         ></app-chars>
         
         <div class="app-charModal scrollbar">
