@@ -9,7 +9,7 @@ import { Message } from '../../interfaces/Message';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class SearchComponent {
-  @Output() onMsg = new EventEmitter<Message>();
+  @Output() msgSent = new EventEmitter<Message>();
   
   constructor(){}
   
@@ -29,6 +29,6 @@ export class SearchComponent {
   
   sendMsg(name:string, content?:any){
     const msg = <Message>{name, content};
-    this.onMsg.emit(msg);
+    this.msgSent.emit(msg);
   }
 }

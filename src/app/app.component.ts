@@ -55,7 +55,8 @@ export class AppComponent {
   searchCharsPage$ = this.store.select(selectSearchCharsPage);
   
   lastFetchedPageIndex:number = 0;
-  maxFetchedPageIndex:number = 0;
+  lastRequestedPageIndex:number = 0;
+  maxRequestedPageIndex:number = 0;
   mode:AppMode = 'default';
   resultsNum:number = 0;
   selChar:Char|undefined = undefined;
@@ -64,7 +65,7 @@ export class AppComponent {
     // this.setMessengerObserver();
     this.setPageObserver().setSearchPageObserver();
     
-    this.maxFetchedPageIndex = 1;
+    this.maxRequestedPageIndex = 1;
     this.fetchCharsPageByIndex(1);
   }
   
@@ -84,7 +85,8 @@ export class AppComponent {
     if (chars.length === 0) return; // RETHINK Should not come as empty.
     
     let chars$ = this.chars$;
-    chars = <Char[]>[...chars$.getValue(), ...chars]; // NOTE merging
+    let chars$Value = chars$.getValue();
+    chars = <Char[]>[...chars$Value, ...chars]; // NOTE merging
     chars$.next(chars);
     
     this.resultsNum = chars.length;
@@ -93,7 +95,7 @@ export class AppComponent {
     if (charsComponent) charsComponent.updateMaxPageIndex(page.totalPages); // RETHINK ensure charsComponent
     
     this.lastFetchedPageIndex += 1;
-    if (this.lastFetchedPageIndex >= this.maxFetchedPageIndex) {
+    if (this.lastFetchedPageIndex >= this.maxRequestedPageIndex) {
       charsComponent.updateResultsIndexes();
       this.updateChartData();
     }
@@ -130,16 +132,17 @@ export class AppComponent {
   //==== Methods ====
   
   fetchCharsPageByIndex(pageIndex:number){
+    this.lastRequestedPageIndex = pageIndex;
     this.store.dispatch(fetchCharsPage({pageIndex}));
     return this;
   }
   
   fetchCharsPages(num:number){
-    this.maxFetchedPageIndex += num;
+    this.maxRequestedPageIndex += num;
     
-    let lastFetchedPageIndex = this.lastFetchedPageIndex;
-    const startIndex = lastFetchedPageIndex + 1;
-    const endIndex = lastFetchedPageIndex + num;
+    let lastRequestedPageIndex = this.lastRequestedPageIndex;
+    const startIndex = lastRequestedPageIndex + 1;
+    const endIndex = lastRequestedPageIndex + num;
     for (let i = startIndex; i <= endIndex; i += 1) {
       this.fetchCharsPageByIndex(i);
     }
