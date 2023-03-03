@@ -1,4 +1,4 @@
-❗ **I developed this project in just 8 days, despite having no prior experience with TypeScript, Angular, RxJS, ngrx, and other related technologies. By taking on this challenge, I was able to demonstrate my ability to quickly learn new skills and technologies, while producing high-quality work.**
+❗ **I developed this project in just 8 days, despite having no prior experience with TypeScript, Angular, RxJS, ngrx, and other related technologies. By taking on this challenge, I was able to demonstrate my ability to quickly learn new skills and technologies and adapt to new situations, while producing high-quality code/results.**
 
 # Disney Characters Dashboard
 
