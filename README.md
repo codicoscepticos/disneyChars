@@ -1,3 +1,5 @@
+❗ **I developed this project in just 8 days, despite having no prior experience with TypeScript, Angular, RxJS, ngrx, and other related technologies. By taking on this challenge, I was able to demonstrate my ability to quickly learn new skills and technologies, while producing high-quality work.**
+
 # Disney Characters Dashboard
 
 A Disney Characters Dashboard that presents a comprehensive table of Disney characters, complete with navigation, search functionality, and statistical capabilities.
@@ -14,4 +16,4 @@ Run `ng build` to build the project. The build artifacts will be stored in the `
 
 # Credits
 
-Using [disneyapi](https://github.com/ManuCastrillonM/disney-api).
+[disneyapi](https://github.com/ManuCastrillonM/disney-api)
