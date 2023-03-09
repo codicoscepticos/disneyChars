@@ -24,6 +24,8 @@ import { HandlerPerMsg } from './interfaces/HandlerPerMsg';
 import { Message } from './interfaces/Message';
 import { Page } from './interfaces/Page';
 import { SearchPage } from './interfaces/SearchPage';
+import { SortingMode } from './interfaces/SortingMode';
+// TODO Put all the interfaces inside a single file.
 
 import { DisneyAPIService } from './services/disney-api.service';
 // import { MessengerService } from './services/messenger.service';
@@ -49,6 +51,18 @@ export class AppComponent {
   
   ngAfterViewInit(){}
   
+  static readonly nextSortingModePerCur: {[key in SortingMode]: SortingMode} = {
+    original: 'ascending',
+    ascending: 'descending',
+    descending: 'original'
+  };
+  
+  static readonly prefixPerSortingMode: {[key in SortingMode]: string } = {
+    original: '',
+    ascending: '↑',
+    descending: '↓'
+  };
+
   chars$ = new BehaviorSubject<Char[]>([]);
   charsPage$ = this.store.select(selectCharsPage); // RETHINK This and below maybe move inside observePage
   searchChars$ = new BehaviorSubject<Char[]>([]);
@@ -58,6 +72,7 @@ export class AppComponent {
   lastRequestedPageIndex:number = 0;
   maxRequestedPageIndex:number = 0;
   mode:AppMode = 'default';
+  sortingMode:SortingMode = 'original';
   resultsNum:number = 0;
   selChar:Char|undefined = undefined;
   
@@ -69,6 +84,30 @@ export class AppComponent {
     this.fetchCharsPageByIndex(1);
   }
   
+  // TODO Move all to helper service.
+  static sortAscendinglyByNumber(n1:number, n2:number){
+    return n1 - n2;
+  }
+  static sortAscendinglyByText(t1:string, t2:string){
+    return t1.localeCompare(t2);
+  }
+  static sortDescendinglyByNumber(n1:number, n2:number){
+    return n2 - n1;
+  }
+  static sortDescendinglyByText(t1:string, t2:string){
+    return t2.localeCompare(t1);
+  }
+  static readonly sortingPerMode = {
+    ascending: {
+      byNumber: AppComponent.sortAscendinglyByNumber,
+      byText: AppComponent.sortAscendinglyByText
+    },
+    descending: {
+      byNumber: AppComponent.sortDescendinglyByNumber,
+      byText: AppComponent.sortDescendinglyByText
+    }
+  };
+
   //==== Observers ====
   
   // observeMsg(msg:Message){
@@ -158,6 +197,36 @@ export class AppComponent {
     return indexes.map(i=>chars[i]).filter(c=>c); // TODO generateIndexes to consider resultsNum (remove filter when ready)
   }
   
+  sortResultsIndexes(sortingMode:SortingMode){
+    let charsComponent = this.charsComponent;
+    let resultsIndexes = charsComponent.getResultsIndexes();
+    resultsIndexes.sort(AppComponent.sortingPerMode.ascending.byNumber);
+    
+    if (sortingMode === 'original') return;
+    
+    const chars$ = (this.mode === 'search') ? this.searchChars$ : this.chars$;
+    const chars = this.getCharsByIndexes(chars$, resultsIndexes);
+    let names = chars.map(char => char.name); // TODO Become method.
+    resultsIndexes = resultsIndexes.slice(0, names.length);
+    
+    const startIndex = resultsIndexes[0];
+    resultsIndexes.sort(function(i1:number, i2:number){ // TODO Become method.
+      if (startIndex > 0) {
+        i1 = i1 % startIndex;
+        i2 = i2 % startIndex;
+      }
+      let name1 = names[i1];
+      let name2 = names[i2];
+      if (sortingMode === 'descending') {
+        const t = name1;
+        name1 = name2;
+        name2 = t;
+      }
+      return name1.localeCompare(name2);
+    });
+    charsComponent.updateResultsIndexes(resultsIndexes);
+  }
+  
   updateChartData(){
     let charsComponent = this.charsComponent;
     if (!charsComponent) return; // RETHINK ensure charsComponent
@@ -181,6 +250,12 @@ export class AppComponent {
   }
   handleCharSelected(char:Char|undefined){
     this.updateSelChar(char);
+  }
+  handleNameClicked(){
+    let sortingMode = this.sortingMode = AppComponent.nextSortingModePerCur[this.sortingMode];
+    const prefix = AppComponent.prefixPerSortingMode[sortingMode];
+    this.charsComponent.updateNameTitlePrefix(prefix);
+    this.sortResultsIndexes(sortingMode);
   }
   handlePageTurned(pageIndex:number){
     let charsComponent = this.charsComponent;
@@ -232,6 +307,7 @@ export class AppComponent {
   
   static readonly handlerPerMsg: HandlerPerMsg = {
     charSelected: 'handleCharSelected',
+    nameClicked: 'handleNameClicked',
     pageTurned: 'handlePageTurned',
     resultsNumPerPageChanged: 'handleResultsNumPerPageChanged',
     searchInputCleared: 'handleSearchInputCleared',

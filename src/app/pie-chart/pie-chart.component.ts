@@ -64,23 +64,17 @@ export class PieChartComponent {
   
   ngOnInit(){}
   
-  static generateChartData(chars:Char[]){
-    let chartData:any[] = [];
+  static chartPointByChar(char:Char){
+    let films:string[] = char.films;
+    let filmsLength = films.length;
+    let htmlFilms = (filmsLength > 0) ? '• ' + films.join('<br>• ') : '';
     
-    chars.forEach(function addChartPoint(char:Char){ // TODO Improve implementation.
-      let films:string[] = char.films;
-      let filmsLength = films.length;
-      let htmlFilms = (filmsLength > 0) ? '• ' + films.join('<br>• ') : '';
-      
-      const point = [ // TODO ChartPoint interface
-        char.name,
-        filmsLength,
-        htmlFilms
-      ];
-      chartData.push(point);
-    });
-    
-    return chartData;
+    const point = [ // TODO ChartPoint interface
+      char.name,
+      filmsLength,
+      htmlFilms
+    ];
+    return point;
   }
   
   chartCallback = (chart:Highcharts.Chart) => {
@@ -91,12 +85,12 @@ export class PieChartComponent {
     let chart = this.chart;
     if (!chart) return;
     
-    const data:any[] = PieChartComponent.generateChartData(chars);
+    const data:any[] = chars.map(PieChartComponent.chartPointByChar);
     const options:Highcharts.Options = {
       series: [{
         type: 'pie',
         name: 'Films',
-        data: data
+        data
       }]
     };
     chart.update(options);

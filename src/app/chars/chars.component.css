@@ -6,11 +6,17 @@
 .chars-headerCell,
 .chars-lastHeaderCell {
     border-right: 1px solid #0000005e;
+    height: 24px;
     padding-left: 2px;
     text-align: center;
+    user-select: none;
 }
 .chars-lastHeaderCell {
     border-right: none;
+}
+
+.chars-name {
+  cursor: pointer;
 }
 
 .chars-results {

@@ -20,6 +20,7 @@ export class CharsComponent {
   readonly headerCellNames = ['Name', '# TV Shows', '# Video Games', 'Allies', 'Enemies'];
   
   initialResultsNumPerPage:number = 50;
+  nameTitlePrefix:string = '';
   maxPageIndex:number = Infinity;
   pageIndex:number = 1; // NOTE Changes according if going to prev or next page.
   prevPageIndex:number = 1;
@@ -33,6 +34,10 @@ export class CharsComponent {
   
   //==== DOM Events ====
   
+  onNameClick(evt:MouseEvent){
+    this.sendMsg('nameClicked');
+  }
+
   onOptionChanged(resultsNumPerPage:any){
     const content = {
       oldResultsNumPerPage: this.resultsNumPerPage,
@@ -79,6 +84,10 @@ export class CharsComponent {
     this.maxPageIndex = index;
   }
   
+  updateNameTitlePrefix(prefix:string){
+    this.nameTitlePrefix = prefix;
+  }
+  
   updatePageIndex(index:number){
     this.pageIndex = index;
     return this;
@@ -94,8 +103,8 @@ export class CharsComponent {
     return this;
   }
   
-  updateResultsIndexes(){
-    this.resultsIndexes = this.generateIndexes();
+  updateResultsIndexes(resultsIndexes?:number[]){
+    this.resultsIndexes = resultsIndexes || this.generateIndexes();
   }
   
   updateResultsNumPerPage(resultsNumPerPage:number){

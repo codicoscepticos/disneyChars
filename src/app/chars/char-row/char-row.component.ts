@@ -18,7 +18,13 @@ export class CharRowComponent {
   //==== DOM Events ====
   
   onClick(evt:MouseEvent){
-    const msg = <Message>{name: 'charSelected', content: this.char};
+    this.sendMsg('charSelected', this.char);
+  }
+  
+  //==== Messaging ====
+  
+  sendMsg(name:string, content?:any){
+    const msg = <Message>{name, content};
     this.msgSent.emit(msg);
   }
 }

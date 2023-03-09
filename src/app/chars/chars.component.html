@@ -1,19 +1,27 @@
 <div class="chars-header">
-    <ng-container *ngFor="let name of headerCellNames; let i = index">
-            <span class="{{
-                ((i < headerCellNames.length - 1) && 'chars-headerCell') || 'chars-lastHeaderCell'
-            }}">
-                {{ name }}
-            </span>
-    </ng-container>
+  <ng-container *ngFor="let name of headerCellNames; let i = index">
+    <ng-container *ngIf="name === 'Name'; then isNameBlock else elseBlock"></ng-container>
+    <ng-template #isNameBlock>
+      <span class="chars-headerCell chars-name" (click)="onNameClick($event)">
+        <span>{{nameTitlePrefix}}</span>Name
+      </span>
+    </ng-template>
+    <ng-template #elseBlock>
+      <span class="{{
+          ((i < headerCellNames.length - 1) && 'chars-headerCell') || 'chars-lastHeaderCell'
+      }}">
+          {{ name }}
+      </span>
+    </ng-template>
+  </ng-container>
 </div>
 
 <ng-container *ngIf="chars$ | async as chars">
-    <div class="chars-results scrollbar">
-        <ng-container *ngFor="let i of resultsIndexes">
-            <app-char-row [char]="chars[i]" (msgSent)="handleMsg($event)"></app-char-row>
-        </ng-container>
-    </div>
+  <div class="chars-results scrollbar">
+    <ng-container *ngFor="let i of resultsIndexes">
+      <app-char-row [char]="chars[i]" (msgSent)="handleMsg($event)"></app-char-row>
+    </ng-container>
+  </div>
 </ng-container>
 
 <div class="chars-controls">
