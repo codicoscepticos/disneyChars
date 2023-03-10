@@ -136,7 +136,7 @@ export class AppComponent {
     this.lastFetchedPageIndex += 1;
     if (this.lastFetchedPageIndex >= this.maxRequestedPageIndex) {
       charsComponent.updateResultsIndexes();
-      this.updateChartData();
+      this.sortResultsIndexes().updateChartData();
     }
   }
   setPageObserver(){
@@ -157,7 +157,7 @@ export class AppComponent {
     let charsComponent = this.charsComponent;
     if (charsComponent) charsComponent.updateResultsIndexes(); // RETHINK ensure charsComponent
     
-    this.updateChartData();
+    this.sortResultsIndexes().updateChartData();
   }
   setSearchPageObserver(){
     this.searchCharsPage$.subscribe({
@@ -197,12 +197,13 @@ export class AppComponent {
     return indexes.map(i=>chars[i]).filter(c=>c); // TODO generateIndexes to consider resultsNum (remove filter when ready)
   }
   
-  sortResultsIndexes(sortingMode:SortingMode){
+  sortResultsIndexes(){
     let charsComponent = this.charsComponent;
     let resultsIndexes = charsComponent.getResultsIndexes();
     resultsIndexes.sort(AppComponent.sortingPerMode.ascending.byNumber);
     
-    if (sortingMode === 'original') return;
+    let sortingMode = this.sortingMode;
+    if (sortingMode === 'original') return this;
     
     const chars$ = (this.mode === 'search') ? this.searchChars$ : this.chars$;
     const chars = this.getCharsByIndexes(chars$, resultsIndexes);
@@ -225,6 +226,8 @@ export class AppComponent {
       return name1.localeCompare(name2);
     });
     charsComponent.updateResultsIndexes(resultsIndexes);
+    
+    return this;
   }
   
   updateChartData(){
@@ -255,7 +258,7 @@ export class AppComponent {
     let sortingMode = this.sortingMode = AppComponent.nextSortingModePerCur[this.sortingMode];
     const prefix = AppComponent.prefixPerSortingMode[sortingMode];
     this.charsComponent.updateNameTitlePrefix(prefix);
-    this.sortResultsIndexes(sortingMode);
+    this.sortResultsIndexes();
   }
   handlePageTurned(pageIndex:number){
     let charsComponent = this.charsComponent;
@@ -265,7 +268,7 @@ export class AppComponent {
     const endIndex = resultsNum - 1;
     const hasSufficientResults = (resultsNum - startIndex >= charsComponent.resultsNumPerPage); // RETHINK if it's the only needed condition
     if (startIndex <= endIndex && hasSufficientResults) {
-      this.updateChartData();
+      this.sortResultsIndexes().updateChartData();
       return;
     }
     
@@ -286,7 +289,7 @@ export class AppComponent {
     const newResultsNum = Math.ceil(resultsNum / newResultsNumPerPage) * newResultsNumPerPage;
     let pagesToFetchNum = (newResultsNum - resultsNum) / DisneyAPIService.resultsNumPerPage;
     if (pagesToFetchNum < 1) {
-      this.updateChartData();
+      this.sortResultsIndexes().updateChartData();
       return;
     }
     
@@ -297,7 +300,7 @@ export class AppComponent {
     this.searchChars$.next([]);
     this.resultsNum = this.chars$.getValue().length;
     this.charsComponent.updatePageIndexToPrev().updateResultsIndexes();
-    this.updateChartData();
+    this.sortResultsIndexes().updateChartData();
   }
   handleSearchInputSubmitted(query:string){
     this.mode = 'search';
