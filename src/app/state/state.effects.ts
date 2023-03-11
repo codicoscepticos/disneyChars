@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { of } from 'rxjs';
-import { catchError, map, mergeMap, switchMap } from 'rxjs/operators';
+import { catchError, concatMap, map, switchMap } from 'rxjs/operators';
 
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import {
@@ -27,7 +27,7 @@ export class CharsPageEffects{
     fetchCharsPage$ = createEffect(()=>
         this.actions$.pipe(
             ofType(fetchCharsPage),
-            mergeMap(
+            concatMap(
                 ({pageIndex})=>this.disneyAPIService.getCharsPage(pageIndex).pipe(
                     map(charsPage=>succeedFetchingCharsPage({
                         charsPage:<Page> charsPage

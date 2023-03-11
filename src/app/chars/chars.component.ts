@@ -20,8 +20,9 @@ export class CharsComponent {
   readonly headerCellNames = ['Name', '# TV Shows', '# Video Games', 'Allies', 'Enemies'];
   
   initialResultsNumPerPage:number = 50;
-  nameTitlePrefix:string = '';
   maxPageIndex:number = Infinity;
+  nameTitlePrefix:string = '';
+  nextPageBtnState:string = 'enabled';
   pageIndex:number = 1; // NOTE Changes according if going to prev or next page.
   prevPageIndex:number = 1;
   resultsIndexes:number[] = [];
@@ -86,6 +87,10 @@ export class CharsComponent {
   
   updateNameTitlePrefix(prefix:string){
     this.nameTitlePrefix = prefix;
+  }
+  
+  updateNextPageBtnState(state:string){
+    this.nextPageBtnState = state;
   }
   
   updatePageIndex(index:number){

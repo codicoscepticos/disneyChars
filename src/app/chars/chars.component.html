@@ -30,6 +30,6 @@
     </select>
     <button class="chars-btnPage" (click)="onPageByDiff(-1)" [disabled]="pageIndex < 2">◀</button>
     <span class="chars-pageIndex">{{ pageIndex }}</span>
-    <button class="chars-btnPage" (click)="onPageByDiff(1)">▶</button> <!-- TODO fix condition [disabled]="pageIndex >= maxPageIndex"-->
+    <button class="chars-btnPage" (click)="onPageByDiff(1)" [disabled]="(nextPageBtnState === 'disabled')">▶</button>
     <app-search (msgSent)="handleMsg($event)"></app-search>
 </div>
