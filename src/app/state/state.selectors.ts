@@ -1,5 +1,5 @@
-import { createSelector } from '@ngrx/store';
-import { AppState } from '../interfaces/AppState';
+// import { createSelector } from '@ngrx/store';
+import { AppState } from '../Types';
 
 export const selectCharsPage = (state:AppState)=>state.charsPage;
 export const selectSearchCharsPage = (state:AppState)=>state.searchCharsPage;

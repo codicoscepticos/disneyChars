@@ -17,15 +17,16 @@ import {
 } from './state/state.actions';
 import { selectCharsPage, selectSearchCharsPage } from './state/state.selectors';
 
-import { AppState } from './interfaces/AppState';
-import { Char } from './interfaces/Char';
-import { CharsMode } from './interfaces/CharsMode';
-import { HandlerPerMsg } from './interfaces/HandlerPerMsg';
-import { Message } from './interfaces/Message';
-import { Page } from './interfaces/Page';
-import { SearchPage } from './interfaces/SearchPage';
-import { SortingMode } from './interfaces/SortingMode';
-// TODO Put all the interfaces inside a single file.
+import {
+  AppState,
+  Char,
+  CharsMode,
+  HandlerPerMsg,
+  Message,
+  Page,
+  SearchPage,
+  SortingMode
+} from './Types';
 
 import { DisneyAPIService } from './services/disney-api.service';
 // import { MessengerService } from './services/messenger.service';

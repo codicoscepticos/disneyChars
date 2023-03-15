@@ -1,7 +1,6 @@
 import { createAction, props } from '@ngrx/store';
 
-import { Page } from '../interfaces/Page';
-import { SearchPage } from '../interfaces/SearchPage';
+import { Page, SearchPage } from '../Types';
 
 export const displayNextPage = createAction('[Chars] Display Next Page');
 export const displayPrevPage = createAction('[Chars] Display Previous Page');

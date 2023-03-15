@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
-import { Char } from 'src/app/interfaces/Char';
+import { Char } from 'src/app/Types';
 
 @Component({
   selector: 'app-char',

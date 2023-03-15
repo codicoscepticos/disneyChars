@@ -1,7 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 
-import { Char } from 'src/app/interfaces/Char';
-import { Message } from 'src/app/interfaces/Message';
+import { Char, Message } from 'src/app/Types';
 
 @Component({
   selector: 'app-char-row',

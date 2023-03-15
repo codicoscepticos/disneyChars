@@ -18,8 +18,7 @@ import {
     displayCharPage
 } from './state.actions';
 
-import { Page } from '../interfaces/Page';
-import { SearchPage } from '../interfaces/SearchPage';
+import { Page, SearchPage } from '../Types';
 
 export const initState:Page = {
     count: 0,

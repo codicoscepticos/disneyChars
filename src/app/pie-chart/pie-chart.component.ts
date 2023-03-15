@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 import * as Highcharts from 'highcharts';
 import HC_exporting from 'highcharts/modules/exporting';
-import { Char } from '../interfaces/Char';
+import { Char } from '../Types';
 HC_exporting(Highcharts);
 
 @Component({

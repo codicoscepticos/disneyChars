@@ -1,9 +1,7 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 
-import { Char } from '../interfaces/Char';
-import { HandlerPerMsg } from '../interfaces/HandlerPerMsg';
-import { Message } from '../interfaces/Message';
+import { Char, HandlerPerMsg, Message } from '../Types';
 
 @Component({
   selector: 'app-chars',

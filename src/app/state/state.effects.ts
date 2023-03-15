@@ -14,8 +14,7 @@ import {
 
 import { DisneyAPIService } from '../services/disney-api.service';
 
-import { Page } from '../interfaces/Page';
-import { SearchPage } from '../interfaces/SearchPage';
+import { Page, SearchPage } from '../Types';
 
 @Injectable()
 export class CharsPageEffects{

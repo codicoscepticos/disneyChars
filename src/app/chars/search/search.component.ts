@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Output } from '@angular/core';
 
-import { Message } from '../../interfaces/Message';
+import { Message } from '../../Types';
 
 @Component({
   selector: 'app-search',
