@@ -6,7 +6,14 @@
     <div class="app-modals">
         <app-chars
             class="app-charsModal"
-            [chars$]="(mode === 'search') ? searchChars$ : chars$"
+            
+            [chars$]="charsMode === 'search' ? searchChars$ : chars$"
+            [initialResultsNumPerPage]="initialResultsNumPerPage"
+            [nameTitlePrefix]="nameTitlePrefix"
+            [nextPageBtnState]="nextPageBtnState"
+            [pageIndex]="pageIndex"
+            [resultsIndexes]="resultsIndexes"
+            
             (msgSent)="handleMsg($event)"
         ></app-chars>
         

@@ -13,108 +13,33 @@ import { Message } from '../interfaces/Message';
 })
 export class CharsComponent {
   @Input() chars$ = new BehaviorSubject<Char[]>([]);
+  @Input() initialResultsNumPerPage:number = 50;
+  @Input() nameTitlePrefix:string = '';
+  @Input() nextPageBtnState:string = 'enabled';
+  @Input() pageIndex:number = 1; // NOTE Changes according if going to prev or next page.
+  @Input() resultsIndexes:number[] = [];
+  
   @Output() msgSent = new EventEmitter<Message>();
   
   constructor(){}
   
   readonly headerCellNames = ['Name', '# TV Shows', '# Video Games', 'Allies', 'Enemies'];
+  readonly selectorOptions:number[] = [10, 20, 50, 100, 200, 500];
   
-  initialResultsNumPerPage:number = 50;
-  maxPageIndex:number = Infinity;
-  nameTitlePrefix:string = '';
-  nextPageBtnState:string = 'enabled';
-  pageIndex:number = 1; // NOTE Changes according if going to prev or next page.
-  prevPageIndex:number = 1;
-  resultsIndexes:number[] = [];
-  resultsNumPerPage:number = 50; // NOTE Updated via the dropdown menu.
-  selectorOptions:number[] = [10, 20, 50, 100, 200, 500];
-  
-  ngOnInit(){
-    this.updateResultsIndexes();
-  }
+  ngOnInit(){}
   
   //==== DOM Events ====
   
   onNameClick(evt:MouseEvent){
     this.sendMsg('nameClicked');
   }
-
-  onOptionChanged(resultsNumPerPage:any){
-    const content = {
-      oldResultsNumPerPage: this.resultsNumPerPage,
-      newResultsNumPerPage: resultsNumPerPage
-    };
-    this.sendMsg('resultsNumPerPageChanged', content);
+  
+  onOptionChanged(newResultsNumPerPage:number){
+    this.sendMsg('resultsNumPerPageChanged', newResultsNumPerPage);
   }
   
   onPageByDiff(diff:number){
-    let pageIndex = this.pageIndex + diff;
-    this.updatePageIndex(pageIndex).updateResultsIndexes();
-    this.sendMsg('pageTurned', pageIndex);
-  }
-  
-  //==== Methods ====
-  
-  generateIndexes(){ // RETHINK Maybe move to a helper service. Take into consideration resultsNum?
-    let indexes = [];
-    
-    let pageIndex = this.pageIndex;
-    let resultsNumPerPage = this.resultsNumPerPage;
-    const startIndex = resultsNumPerPage * (pageIndex - 1);
-    const endIndex = resultsNumPerPage * pageIndex - 1;
-    for (let i = startIndex; i <= endIndex; i += 1) {
-      indexes.push(i);
-    }
-    
-    return indexes;
-  }
-  
-  getPageIndex(){
-    return this.pageIndex;
-  }
-  
-  getResultsNumPerPage(){
-    return this.resultsNumPerPage;
-  }
-  
-  getResultsIndexes(){
-    return this.resultsIndexes;
-  }
-  
-  updateMaxPageIndex(index:number){
-    this.maxPageIndex = index;
-  }
-  
-  updateNameTitlePrefix(prefix:string){
-    this.nameTitlePrefix = prefix;
-  }
-  
-  updateNextPageBtnState(state:string){
-    this.nextPageBtnState = state;
-  }
-  
-  updatePageIndex(index:number){
-    this.pageIndex = index;
-    return this;
-  }
-  
-  updatePageIndexToPrev(){
-    this.pageIndex = this.prevPageIndex;
-    return this;
-  }
-  
-  updatePrevPageIndex(){
-    this.prevPageIndex = this.pageIndex;
-    return this;
-  }
-  
-  updateResultsIndexes(resultsIndexes?:number[]){
-    this.resultsIndexes = resultsIndexes || this.generateIndexes();
-  }
-  
-  updateResultsNumPerPage(resultsNumPerPage:number){
-    this.resultsNumPerPage = resultsNumPerPage;
-    return this;
+    this.sendMsg('pageTurned', diff);
   }
   
   //==== Messaging ====
