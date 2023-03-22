@@ -16,7 +16,7 @@
   </ng-container>
 </div>
 
-<ng-container *ngIf="chars$ | async as chars">
+<ng-container *ngIf="chars">
   <div class="chars-results scrollbar">
     <ng-container *ngFor="let i of resultsIndexes">
       <app-char-row [char]="chars[i]" (msgSent)="handleMsg($event)"></app-char-row>

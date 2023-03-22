@@ -34,7 +34,14 @@ export interface CharsState{ // TODO To be used.
   searchChars:Char[],
   searchCharsPage:SearchPage,
   selChar:Char|undefined,
-  sortingMode:SortingMode
+  sortingMode:SortingMode,
+  // Disney API
+  lastFetchedPageIndex:number,
+  lastRequestedPageIndex:number,
+  maxRequestedPageIndex:number,
+  maxResultsNum:number,
+  resultsNum:number,
+  totalPages:number
 }
 
 export interface HandlerPerMsg{
@@ -48,7 +55,7 @@ export interface Message{
 
 export interface Page{
   count:number,
-  data:Object[],
+  data:Char[],
   nextPage:string,
   prevPage:string,
   totalPages:number

@@ -10,7 +10,7 @@ import { Char, HandlerPerMsg, Message } from '../Types';
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class CharsComponent {
-  @Input() chars$ = new BehaviorSubject<Char[]>([]);
+  @Input() chars:Char[] = [];
   @Input() initialResultsNumPerPage:number = 50;
   @Input() nameTitlePrefix:string = '';
   @Input() nextPageBtnState:string = 'enabled';

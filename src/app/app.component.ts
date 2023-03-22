@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { BehaviorSubject, Observable, take } from 'rxjs';
 
 import { Store } from '@ngrx/store';
 import {
@@ -10,15 +10,47 @@ import {
   displayNextPage,
   displayPrevPage,
   searchResults,
-  selectResultsNum,
   sortByName,
   // [Char Row]
-  displayCharPage
+  displayCharPage,
+  mergeChars,
+  sortResultsIndexes,
+  searchInputCleared,
+  searchInputSubmitted,
+  nameClicked,
+  updateNextPageBtnState,
+  updatePageIndex,
+  updateResultsNumPerPage,
+  updateResultsIndexes,
+  updateSearchChars,
+  updateSelChar,
+  updateResultsNum,
+  updateLastFetchedPageIndex,
+  updateTotalPages,
+  updateMaxResultsNum,
+  updateMaxRequestedPageIndex
 } from './state/state.actions';
 import {
   selectChars,
+  selectCharsMode,
   selectCharsPage,
-  selectSearchCharsPage
+  selectInitialResultsNumPerPage,
+  selectLastFetchedPageIndex,
+  selectLastRequestedPageIndex,
+  selectMaxRequestedPageIndex,
+  selectMaxResultsNum,
+  selectNameTitlePrefix,
+  selectNextPageBtnState,
+  selectPageIndex,
+  selectPrevPageIndex,
+  selectResultsIndexes,
+  selectResultsNum,
+  selectResultsNumPerPage,
+  selectSearchChars,
+  selectSearchCharsPage,
+  selectSelChar,
+  selectSortingMode,
+  selectTotalPages
 } from './state/state.selectors';
 
 import {
@@ -45,26 +77,54 @@ import { PieChartComponent } from './pie-chart/pie-chart.component';
 export class AppComponent {
   @ViewChild(PieChartComponent) private pieChartComponent!:PieChartComponent;
   
-  chars$ = new BehaviorSubject<Char[]>([]);
-  charsMode:CharsMode = 'default';
-  charsPage$ = this.store.select(selectCharsPage); // RETHINK This and below maybe move inside observePage
-  initialResultsNumPerPage:number = 50; // RETHINK Is it fixed? Or is it updated?
-  nameTitlePrefix:string = '';
-  nextPageBtnState:string = 'enabled';
-  pageIndex:number = 1; // NOTE Changes according if going to prev or next page.
-  prevPageIndex:number = 1;
-  resultsIndexes:number[] = [];
-  resultsNumPerPage:number = 50; // NOTE Updated via the dropdown menu.
-  searchChars$ = new BehaviorSubject<Char[]>([]);
-  searchCharsPage$ = this.store.select(selectSearchCharsPage);
-  selChar:Char|undefined = undefined;
-  sortingMode:SortingMode = 'original';
+  chars$:Observable<Char[]>;
+  charsMode$:Observable<string>;
+  charsPage$:Observable<Page>; // RETHINK This and below maybe move inside observePage
+  initialResultsNumPerPage$:Observable<number>; // RETHINK Is it fixed? Or is it updated?
+  nameTitlePrefix$:Observable<string>;
+  nextPageBtnState$:Observable<string>;
+  pageIndex$:Observable<number>; // NOTE Changes according if going to prev or next page.
+  prevPageIndex$:Observable<number>;
+  resultsIndexes$:Observable<number[]>;
+  resultsNumPerPage$:Observable<number>; // NOTE Updated via the dropdown menu.
+  searchChars$:Observable<Char[]>;
+  searchCharsPage$:Observable<SearchPage>;
+  selChar$:Observable<Char | undefined>;
+  sortingMode$:Observable<SortingMode>;
+  // Disney API
+  lastFetchedPageIndex$:Observable<number>;
+  lastRequestedPageIndex$:Observable<number>;
+  maxRequestedPageIndex$:Observable<number>;
+  maxResultsNum$:Observable<number>;
+  resultsNum$:Observable<number>;
+  totalPages$:Observable<number>;
   
   constructor(
     // private messengerService:MessengerService,
     private store: Store<AppState>
   ){
-    this.chars$ = this.store.select(selectChars);
+    let select = store.select.bind(store);
+    this.chars$ = select(selectChars);
+    this.charsMode$ = select(selectCharsMode);
+    this.charsPage$ = select(selectCharsPage);
+    this.initialResultsNumPerPage$ = select(selectInitialResultsNumPerPage);
+    this.nameTitlePrefix$ = select(selectNameTitlePrefix);
+    this.nextPageBtnState$ = select(selectNextPageBtnState);
+    this.pageIndex$ = select(selectPageIndex);
+    this.prevPageIndex$ = select(selectPrevPageIndex);
+    this.resultsIndexes$ = select(selectResultsIndexes);
+    this.resultsNumPerPage$ = select(selectResultsNumPerPage);
+    this.searchChars$ = select(selectSearchChars);
+    this.searchCharsPage$ = select(selectSearchCharsPage);
+    this.selChar$ = select(selectSelChar);
+    this.sortingMode$ = select(selectSortingMode);
+    // Disney API
+    this.lastFetchedPageIndex$ = select(selectLastFetchedPageIndex);
+    this.lastRequestedPageIndex$ = select(selectLastRequestedPageIndex);
+    this.maxRequestedPageIndex$ = select(selectMaxRequestedPageIndex);
+    this.maxResultsNum$ = select(selectMaxResultsNum);
+    this.resultsNum$ = select(selectResultsNum);
+    this.totalPages$ = select(selectTotalPages);
   }
   
   static readonly nextSortingModePerCur: {[key in SortingMode]: SortingMode} = {
@@ -79,13 +139,6 @@ export class AppComponent {
     descending: '↓'
   };
   
-  lastFetchedPageIndex:number = 0;
-  lastRequestedPageIndex:number = 0;
-  maxRequestedPageIndex:number = 0;
-  maxResultsNum:number = Infinity;
-  resultsNum:number = 0;
-  totalPages:number = Infinity;
-  
   ngOnInit(){
     AppComponent.assignHandlersForMsgs();
   }
@@ -95,8 +148,12 @@ export class AppComponent {
     // this.setMessengerObserver();
     this.setPageObserver().setSearchPageObserver();
     
-    this.maxRequestedPageIndex = 1;
+    this.store.dispatch(updateMaxRequestedPageIndex({maxRequestedPageIndex: 1}));
     this.fetchCharsPageByIndex(1);
+  }
+  
+  static charsByIndexes(chars:Char[], indexes:number[]){ // TODO Move all to helper service.
+    return indexes.map(i=>chars[i]).filter(c=>c); // TODO generateIndexes to consider resultsNum (remove filter when ready)
   }
   
   // TODO Move all to helper service.
@@ -141,26 +198,24 @@ export class AppComponent {
       return;
     }
     
-    let chars = <Char[]>page.data;
+    const store = this.store;
+    let dispatch = store.dispatch.bind(store);
     
-    let chars$ = this.chars$;
-    let chars$Value = chars$.getValue();
-    chars = <Char[]>[...chars$Value, ...chars]; // NOTE merging
-    chars$.next(chars);
+    let chars = page.data;
+    dispatch(mergeChars({chars}));
+    dispatch(updateResultsNum({resultsNum: chars.length}));
     
-    this.resultsNum = chars.length;
+    let lastFetchedPageIndex = this.getValue(selectLastFetchedPageIndex) + 1;
+    dispatch(updateLastFetchedPageIndex({lastFetchedPageIndex}));
     
-    let lastFetchedPageIndex = this.lastFetchedPageIndex += 1;
+    let totalPages = page.totalPages;
+    dispatch(updateTotalPages({totalPages: page.totalPages}));
+    dispatch(updateMaxResultsNum());
     
-    let totalPages = this.totalPages = page.totalPages;
-    if (totalPages === lastFetchedPageIndex) {
-      this.maxResultsNum = this.resultsNum;
-      this.updateNextPageBtnState();
-    } else {
-      this.maxResultsNum = totalPages * DisneyAPIService.resultsNumPerPage; // TODO Move to ngOnInit
-    }
+    if (totalPages === lastFetchedPageIndex) this.updateNextPageBtnState();
     
-    if (lastFetchedPageIndex >= this.maxRequestedPageIndex) return;
+    const maxRequestedPageIndex = this.getValue(selectMaxRequestedPageIndex);
+    if (lastFetchedPageIndex >= maxRequestedPageIndex) return;
     
     this.updateResultsIndexes().sortResultsIndexes().updateChartData();
   }
@@ -180,9 +235,8 @@ export class AppComponent {
       return;
     }
     
-    let searchChars = <Char[]>page.data;
-    this.searchChars$.next(searchChars);
-    this.resultsNum = searchChars.length;
+    const searchChars = <Char[]>page.data;
+    this.store.dispatch(updateSearchChars({searchChars}));
     
     this.updateResultsIndexes();
     this.sortResultsIndexes().updateChartData();
@@ -199,20 +253,19 @@ export class AppComponent {
   //==== Methods ====
   
   fetchCharsPageByIndex(pageIndex:number){
-    this.lastRequestedPageIndex = pageIndex;
     this.store.dispatch(fetchCharsPage({pageIndex}));
     return this;
   }
   
   fetchCharsPages(num:number){
-    let totalPages = this.totalPages;
-    let maxRequestedPageIndex = this.maxRequestedPageIndex += num;
+    let totalPages = this.getValue(selectTotalPages);
+    let maxRequestedPageIndex = this.getValue(selectMaxRequestedPageIndex) + num;
     if (maxRequestedPageIndex > totalPages) {
       num -= (maxRequestedPageIndex - totalPages);
-      this.maxRequestedPageIndex = totalPages;
+      this.store.dispatch(updateMaxRequestedPageIndex({maxRequestedPageIndex: totalPages}));
     }
     
-    let lastRequestedPageIndex = this.lastRequestedPageIndex;
+    let lastRequestedPageIndex = this.getValue(selectLastRequestedPageIndex);
     const startIndex = lastRequestedPageIndex + 1;
     const endIndex = lastRequestedPageIndex + num;
     for (let i = startIndex; i <= endIndex; i += 1) {
@@ -228,8 +281,8 @@ export class AppComponent {
   generateIndexes(){ // RETHINK Maybe move to a helper service. Take into consideration resultsNum?
     let indexes = [];
     
-    let pageIndex = this.pageIndex;
-    let resultsNumPerPage = this.resultsNumPerPage;
+    let pageIndex = this.getValue(selectPageIndex);
+    let resultsNumPerPage = this.getValue(selectResultsNumPerPage);
     const startIndex = resultsNumPerPage * (pageIndex - 1);
     const endIndex = resultsNumPerPage * pageIndex - 1;
     for (let i = startIndex; i <= endIndex; i += 1) {
@@ -239,75 +292,42 @@ export class AppComponent {
     return indexes;
   }
   
-  getCharsByIndexes(chars$:BehaviorSubject<Char[]>, indexes:number[]){
-    let chars:Char[] = chars$.getValue();
-    return indexes.map(i=>chars[i]).filter(c=>c); // TODO generateIndexes to consider resultsNum (remove filter when ready)
-  }
-  
   sortResultsIndexes(){
-    let resultsIndexes = this.resultsIndexes;
-    resultsIndexes.sort(AppComponent.sortingPerMode.ascending.byNumber);
-    
-    let sortingMode = this.sortingMode;
-    if (sortingMode === 'original') return this;
-    
-    const chars$ = (this.charsMode === 'search') ? this.searchChars$ : this.chars$;
-    const chars = this.getCharsByIndexes(chars$, resultsIndexes);
-    let names = chars.map(char => char.name); // TODO Become method.
-    resultsIndexes = resultsIndexes.slice(0, names.length);
-    
-    const startIndex = resultsIndexes[0];
-    resultsIndexes.sort(function(i1:number, i2:number){ // TODO Become method.
-      if (startIndex > 0) {
-        i1 = i1 % startIndex;
-        i2 = i2 % startIndex;
-      }
-      let name1 = names[i1];
-      let name2 = names[i2];
-      if (sortingMode === 'descending') {
-        const t = name1;
-        name1 = name2;
-        name2 = t;
-      }
-      return name1.localeCompare(name2);
-    });
-    this.updateResultsIndexes(resultsIndexes);
-    
+    this.store.dispatch(sortResultsIndexes());
     return this;
   }
   
   updateChartData(){
-    const chars$ = (this.charsMode === 'search') ? this.searchChars$ : this.chars$; // RETHINK implementation
-    const chars = this.getCharsByIndexes(chars$, this.resultsIndexes);
-    this.pieChartComponent.updateChartData(chars);
+    this.pieChartComponent.updateChartData();
     return this;
   }
   
   updateNextPageBtnState(){
-    const maxPageIndex = Math.ceil(this.maxResultsNum / this.resultsNumPerPage);
-    this.nextPageBtnState = (this.pageIndex < maxPageIndex) ? 'enabled' : 'disabled';
+    this.store.dispatch(updateNextPageBtnState());
   }
   
   updateResultsIndexes(resultsIndexes?:number[]){
-    this.resultsIndexes = resultsIndexes || this.generateIndexes();
-    return this;
-  }
-  
-  updateSelChar(char:Char|undefined){
-    this.selChar = char;
+    const newResultsIndexes = resultsIndexes || this.generateIndexes();
+    this.store.dispatch(updateResultsIndexes({resultsIndexes: newResultsIndexes}));
     return this;
   }
   
   hasSufficientResults(pageIndex:number){
-    let startIndex = (pageIndex - 1) * this.resultsNumPerPage;
-    const endIndex = this.resultsNum - 1;
+    let startIndex = (pageIndex - 1) * this.getValue(selectResultsNumPerPage);
+    const endIndex = this.getValue(selectResultsNum) - 1;
     if (startIndex <= endIndex) return true;
     
-    let chars = this.chars$.getValue();
+    let chars = this.getValue(selectChars);
     const isChar = chars[startIndex];
     if (isChar !== undefined) return true;
     
     return false;
+  }
+  
+  getValue(selector: any){
+    let value:any;
+    this.store.select(selector).pipe(take(1)).subscribe(stateValue => value = stateValue);
+    return value;
   }
   
   //==== Messaging ====
@@ -316,17 +336,17 @@ export class AppComponent {
     const handler = <Function>AppComponent.handlerPerMsg[msg.name];
     if (handler) handler.call(this, msg.content);
   }
-  handleCharSelected(char:Char|undefined){
-    this.updateSelChar(char);
+  handleCharSelected(selChar:Char|undefined){
+    this.store.dispatch(updateSelChar({selChar}));
   }
   handleNameClicked(){
-    let sortingMode = this.sortingMode = AppComponent.nextSortingModePerCur[this.sortingMode];
-    const prefix = AppComponent.prefixPerSortingMode[sortingMode];
-    this.nameTitlePrefix = prefix;
+    this.store.dispatch(nameClicked());
     this.sortResultsIndexes();
   }
   handlePageTurned(diff:number){
-    let pageIndex = this.pageIndex += diff;
+    let pageIndex = this.getValue(selectPageIndex) + diff;
+    this.store.dispatch(updatePageIndex({pageIndex}));
+    
     this.updateResultsIndexes().updateNextPageBtnState();
     
     if (this.hasSufficientResults(pageIndex)) {
@@ -334,33 +354,32 @@ export class AppComponent {
       return;
     }
     
-    const pagesToFetchNum = Math.ceil(this.resultsNumPerPage / DisneyAPIService.resultsNumPerPage);
+    const resultsNumPerPage = this.getValue(selectResultsNumPerPage);
+    const pagesToFetchNum = Math.ceil(resultsNumPerPage / DisneyAPIService.resultsNumPerPage);
     this.fetchCharsPages(pagesToFetchNum);
   }
   handleResultsNumPerPageChanged(newResultsNumPerPage:number){
-    this.pageIndex = Math.floor((this.pageIndex - 1) * (this.resultsNumPerPage / newResultsNumPerPage) + 1);
+    let resultsNumPerPage = this.getValue(selectResultsNumPerPage);
+    let pageIndex = this.getValue(selectPageIndex);
+    pageIndex = Math.floor((pageIndex - 1) * (resultsNumPerPage / newResultsNumPerPage) + 1);
+    this.store.dispatch(updatePageIndex({pageIndex}));
     
-    this.resultsNumPerPage = newResultsNumPerPage;
+    this.store.dispatch(updateResultsNumPerPage({resultsNumPerPage: newResultsNumPerPage}))
     this.updateResultsIndexes().updateNextPageBtnState();
     
-    let resultsNum = this.resultsNum;
+    let resultsNum = this.getValue(selectResultsNum);
     const newResultsNum = Math.ceil(resultsNum / newResultsNumPerPage) * newResultsNumPerPage;
     let pagesToFetchNum = (newResultsNum - resultsNum) / DisneyAPIService.resultsNumPerPage;
     if (pagesToFetchNum > 0) this.fetchCharsPages(pagesToFetchNum);
     else this.sortResultsIndexes().updateChartData();
   }
   handleSearchInputCleared(){
-    this.charsMode = 'default';
-    this.searchChars$.next([]);
-    this.resultsNum = this.chars$.getValue().length;
-    this.pageIndex = this.prevPageIndex;
+    this.store.dispatch(searchInputCleared());
     this.updateResultsIndexes();
     this.sortResultsIndexes().updateChartData();
   }
   handleSearchInputSubmitted(query:string){
-    this.charsMode = 'search';
-    this.prevPageIndex = this.pageIndex;
-    this.pageIndex = 1;
+    this.store.dispatch(searchInputSubmitted());
     this.fetchSearchCharsPageByIndex(query);
   }
   

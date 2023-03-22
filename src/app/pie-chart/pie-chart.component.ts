@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 
 import * as Highcharts from 'highcharts';
 import HC_exporting from 'highcharts/modules/exporting';
@@ -12,6 +12,9 @@ HC_exporting(Highcharts);
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PieChartComponent {
+  @Input() chars:Char[]|null = [];
+  @Input() resultsIndexes:number[] = [];
+  
   constructor(){}
   
   Highcharts:typeof Highcharts = Highcharts;
@@ -81,10 +84,13 @@ export class PieChartComponent {
     if (!this.chart) this.chart = chart;
   }
   
-  updateChartData(chars:Char[]) {
+  updateChartData(){
+    if (!this.chars) return;
+    
     let chart = this.chart;
     if (!chart) return;
     
+    let chars = this.resultsIndexes.map(index=>this.chars![index]).filter(c=>c); // TODO Use charsByIndexes
     const data:any[] = chars.map(PieChartComponent.chartPointByChar);
     const options:Highcharts.Options = {
       series: [{

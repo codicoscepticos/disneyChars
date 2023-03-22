@@ -7,24 +7,35 @@
         <app-chars
             class="app-charsModal"
             
-            [chars$]="charsMode === 'search' ? searchChars$ : chars$"
-            [initialResultsNumPerPage]="initialResultsNumPerPage"
-            [nameTitlePrefix]="nameTitlePrefix"
-            [nextPageBtnState]="nextPageBtnState"
-            [pageIndex]="pageIndex"
-            [resultsIndexes]="resultsIndexes"
+            [chars]="(
+              (
+                (charsMode$ | async) === 'search' ? searchChars$ : chars$
+              ) | async
+            )!"
+            [initialResultsNumPerPage]="(initialResultsNumPerPage$ | async)!"
+            [nameTitlePrefix]="(nameTitlePrefix$ | async)!"
+            [nextPageBtnState]="(nextPageBtnState$ | async)!"
+            [pageIndex]="(pageIndex$ | async)!"
+            [resultsIndexes]="(resultsIndexes$ | async)!"
             
             (msgSent)="handleMsg($event)"
         ></app-chars>
         
         <div class="app-charModal scrollbar">
-            <ng-container *ngIf="selChar !== undefined">
-                <app-char [char]="selChar"></app-char>
+            <ng-container *ngIf="(selChar$ | async) !== undefined">
+                <app-char [char]="(selChar$ | async)!"></app-char>
             </ng-container>
         </div>
     </div>
     
-    <app-pie-chart></app-pie-chart>
+    <app-pie-chart
+      [chars]="(
+        (
+          (charsMode$ | async) === 'search' ? searchChars$ : chars$
+        ) | async
+      )!"
+      [resultsIndexes]="(resultsIndexes$  | async)!"
+    ></app-pie-chart>
     
     <div class="app-footer">
         Made by <a href="https://www.linkedin.com/in/georgios-sotiropoulos/">codicoscepticos</a> - 2023
