@@ -15,7 +15,11 @@ import {
   // [Char Row]
   displayCharPage
 } from './state/state.actions';
-import { selectCharsPage, selectSearchCharsPage } from './state/state.selectors';
+import {
+  selectChars,
+  selectCharsPage,
+  selectSearchCharsPage
+} from './state/state.selectors';
 
 import {
   AppState,
@@ -41,11 +45,26 @@ import { PieChartComponent } from './pie-chart/pie-chart.component';
 export class AppComponent {
   @ViewChild(PieChartComponent) private pieChartComponent!:PieChartComponent;
   
+  chars$ = new BehaviorSubject<Char[]>([]);
+  charsMode:CharsMode = 'default';
+  charsPage$ = this.store.select(selectCharsPage); // RETHINK This and below maybe move inside observePage
+  initialResultsNumPerPage:number = 50; // RETHINK Is it fixed? Or is it updated?
+  nameTitlePrefix:string = '';
+  nextPageBtnState:string = 'enabled';
+  pageIndex:number = 1; // NOTE Changes according if going to prev or next page.
+  prevPageIndex:number = 1;
+  resultsIndexes:number[] = [];
+  resultsNumPerPage:number = 50; // NOTE Updated via the dropdown menu.
+  searchChars$ = new BehaviorSubject<Char[]>([]);
+  searchCharsPage$ = this.store.select(selectSearchCharsPage);
+  selChar:Char|undefined = undefined;
+  sortingMode:SortingMode = 'original';
+  
   constructor(
     // private messengerService:MessengerService,
     private store: Store<AppState>
   ){
-    AppComponent.assignHandlersForMsgs();
+    this.chars$ = this.store.select(selectChars);
   }
   
   static readonly nextSortingModePerCur: {[key in SortingMode]: SortingMode} = {
@@ -67,23 +86,9 @@ export class AppComponent {
   resultsNum:number = 0;
   totalPages:number = Infinity;
   
-  chars$ = new BehaviorSubject<Char[]>([]);
-  charsPage$ = this.store.select(selectCharsPage); // RETHINK This and below maybe move inside observePage
-  searchChars$ = new BehaviorSubject<Char[]>([]);
-  searchCharsPage$ = this.store.select(selectSearchCharsPage);
-  
-  charsMode:CharsMode = 'default';
-  initialResultsNumPerPage:number = 50; // RETHINK Is it fixed? Or is it updated?
-  nameTitlePrefix:string = '';
-  nextPageBtnState:string = 'enabled';
-  pageIndex:number = 1; // NOTE Changes according if going to prev or next page.
-  prevPageIndex:number = 1;
-  resultsIndexes:number[] = [];
-  resultsNumPerPage:number = 50; // NOTE Updated via the dropdown menu.
-  selChar:Char|undefined = undefined;
-  sortingMode:SortingMode = 'original';
-  
-  ngOnInit(){}
+  ngOnInit(){
+    AppComponent.assignHandlersForMsgs();
+  }
   ngAfterViewInit(){
     this.updateResultsIndexes();
     

@@ -29,7 +29,7 @@ export class CharsPageEffects{
             concatMap(
                 ({pageIndex})=>this.disneyAPIService.getCharsPage(pageIndex).pipe(
                     map(charsPage=>succeedFetchingCharsPage({
-                        charsPage:<Page> charsPage
+                        charsPage: <Page>charsPage
                     })),
                     catchError(error=>of(failFetchingCharsPage({ error })))
                 )
@@ -43,7 +43,7 @@ export class CharsPageEffects{
             switchMap(
                 ({query})=>this.disneyAPIService.getSearchCharsPage(query).pipe(
                     map(searchCharsPage=>succeedFetchingSearchCharsPage({
-                        searchCharsPage:<SearchPage> searchCharsPage
+                        searchCharsPage: <SearchPage>searchCharsPage
                     })),
                     catchError(error=>of(failFetchingSearchCharsPage({ error })))
                 )

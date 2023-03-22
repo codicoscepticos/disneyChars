@@ -1,10 +1,26 @@
-// import { createSelector } from '@ngrx/store';
-import { AppState } from '../Types';
+import { createSelector } from '@ngrx/store';
 
-export const selectCharsPage = (state:AppState)=>state.charsPage;
-export const selectSearchCharsPage = (state:AppState)=>state.searchCharsPage;
+import {
+  AppState,
+  Char,
+  CharsState,
+  Page,
+  SearchPage
+} from '../Types';
 
-// export const selectCharsPage = createSelector(
-//     selectCharsPageState,
-//     (state:Page)=>state.data
-// )
+export const selectCharsState = (state:AppState)=>state.charsState;
+
+export const selectChars = createSelector(
+  selectCharsState,
+  (state:CharsState):Char[]=>state.chars
+);
+
+export const selectCharsPage = createSelector(
+  selectCharsState,
+  (state:CharsState):Page=>state.charsPage
+);
+
+export const selectSearchCharsPage = createSelector(
+  selectCharsState,
+  (state:CharsState):SearchPage=>state.searchCharsPage
+);

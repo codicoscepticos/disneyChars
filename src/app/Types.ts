@@ -1,6 +1,5 @@
 export interface AppState{
-  charsPage:Page,
-  searchCharsPage:SearchPage
+  charsState:CharsState
 }
 
 export interface Char{
@@ -23,9 +22,20 @@ export type CharsMode = 'default' | 'search';
 
 export interface CharsState{ // TODO To be used.
   chars:Char[],
+  charsMode:CharsMode,
+  charsPage:Page,
+  initialResultsNumPerPage:number,
+  nameTitlePrefix:string,
+  nextPageBtnState:string,
   pageIndex:number,
-  selChar:null
-};
+  prevPageIndex:number,
+  resultsIndexes:number[],
+  resultsNumPerPage:number,
+  searchChars:Char[],
+  searchCharsPage:SearchPage,
+  selChar:Char|undefined,
+  sortingMode:SortingMode
+}
 
 export interface HandlerPerMsg{
   [key:string]: string | Function
