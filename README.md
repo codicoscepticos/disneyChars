@@ -14,6 +14,10 @@ Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The appli
 
 Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory.
 
+# Github Pages
+
+To deploy to Github Pages follow these instructions: https://v15.angular.io/guide/deployment#deploy-to-github-pages
+
 # Credits
 
 [disneyapi](https://github.com/ManuCastrillonM/disney-api)
